@@ -136,9 +136,9 @@ const Footer = () => (
       </div>
 
       <div className="pt-12 border-t border-white/5 dark:border-slate-900 text-center text-slate-500 dark:text-slate-600 text-sm">
-        <p>&copy; {new Date().getFullYear()} ALIF AL FATAH PUTRA</p>
         <p>
-          &copy; {new Date().getFullYear()} CORNELIUS JOHAN SEPTIAN WIRA PRATAMA
+          &copy; {new Date().getFullYear()} ALIF AL FATAH PUTRA, CORNELIUS JOHAN
+          SEPTIAN WIRA PRATAMA
         </p>
       </div>
     </div>
