@@ -1,11 +1,27 @@
 <!doctype html>
-<html lang="en">
+<html lang="id">
   <head>
     <meta charset="UTF-8" />
     <!-- Menambahkan favicon dari folder public -->
     <link rel="icon" type="image/png" href="/LOGONOBG.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sahid Tani</title>
+    <meta name="theme-color" content="#0f7a44" />
+    <meta
+      name="description"
+      content="Sahid Tani — pusat bibit buah unggul di Salatiga. Bibit durian, alpukat, mangga, jeruk, dan lainnya, siap kirim ke seluruh Indonesia."
+    />
+    <title>Sahid Tani — Pusat Bibit Buah Unggul</title>
+    <script>
+      // Pasang tema sebelum halaman digambar supaya tidak berkedip putih di mode gelap.
+      (function () {
+        try {
+          var t = localStorage.getItem('theme');
+          if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

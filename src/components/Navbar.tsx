@@ -1,120 +1,239 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { ShoppingCart, Menu, X, Sun, Moon } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import {
+  ShoppingCart,
+  Menu,
+  X,
+  Sun,
+  Moon,
+  Phone,
+  Truck,
+  Home,
+  Sprout,
+  Info,
+  MessageCircle,
+  ShieldCheck,
+} from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useTheme } from '../hooks/useTheme';
 
 interface NavbarProps {
   cartCount: number;
   onCartClick: () => void;
 }
 
+const navLinks = [
+  { name: 'Beranda', path: '/', icon: Home },
+  { name: 'Tentang', path: '/tentang', icon: Info },
+  { name: 'Produk', path: '/produk', icon: Sprout },
+  { name: 'Kontak', path: '/kontak', icon: MessageCircle },
+];
+
+const WA_LINK =
+  'https://wa.me/6285878412411?text=Halo%20Sahid%20Tani%2C%20saya%20mau%20tanya%20soal%20bibit%20buah.';
+
 const Navbar: React.FC<NavbarProps> = ({ cartCount, onCartClick }) => {
+  const { pathname } = useLocation();
+  const { isDark, toggle } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('theme') === 'dark' || 
-             (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    }
-    return false;
-  });
+  const [scrolled, setScrolled] = useState(false);
 
+  // Header mengecil saat digulir supaya layar HP tidak termakan.
   useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-    }
-  }, [isDarkMode]);
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
-  const toggleTheme = () => setIsDarkMode(!isDarkMode);
+  // Kunci gulir latar saat menu HP terbuka.
+  useEffect(() => {
+    document.body.style.overflow = isMenuOpen ? 'hidden' : '';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMenuOpen]);
 
-  const navLinks = [
-    { name: 'Beranda', path: '/' },
-    { name: 'Tentang Kami', path: '/tentang' },
-    { name: 'Produk', path: '/produk' },
-    { name: 'Kontak', path: '/kontak' },
-  ];
+  // Tutup menu setiap pindah halaman.
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [pathname]);
+
+  const isActive = (path: string) =>
+    path === '/' ? pathname === '/' : pathname.startsWith(path);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-20 md:h-24">
-          <Link to="/" className="flex items-center gap-2">
-            <img src="/logonavbarnobg.png" alt="Logo Sahid Tani" className="h-14 md:h-20 w-auto object-contain" />
-          </Link>
-          
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => (
-              <Link 
-                key={link.path} 
-                to={link.path} 
-                className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary transition-colors"
-              >
-                {link.name}
-              </Link>
-            ))}
-          </div>
-
-          <div className="flex items-center gap-2 md:gap-4">
-            <button 
-              onClick={toggleTheme}
-              className="p-2 hover:bg-secondary dark:hover:bg-primary/20 rounded-full transition-colors text-slate-600 dark:text-slate-400"
-              title={isDarkMode ? 'Mode Terang' : 'Mode Gelap'}
-            >
-              {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-            </button>
-
-            <button 
-              onClick={onCartClick}
-              className="p-2 hover:bg-secondary dark:hover:bg-primary/20 rounded-full transition-colors relative"
-            >
-              <ShoppingCart className="w-5 h-5 text-slate-600 dark:text-slate-400" />
-              {cartCount > 0 && (
-                <span className="absolute top-0 right-0 bg-primary text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full">
-                  {cartCount}
-                </span>
-              )}
-            </button>
-            
-            {/* Mobile Menu Toggle */}
-            <button 
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden p-2 hover:bg-secondary dark:hover:bg-primary/20 rounded-full transition-colors text-slate-600 dark:text-slate-400"
-            >
-              {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
-          </div>
+    <header className="fixed inset-x-0 top-0 z-50">
+      {/* Pita informasi: ikut hilang begitu halaman digulir. */}
+      <div
+        className={`overflow-hidden bg-deep text-ondeep transition-all duration-300 ${
+          scrolled ? 'max-h-0 opacity-0' : 'max-h-10 opacity-100'
+        }`}
+      >
+        <div className="shell flex h-9 items-center justify-center gap-2 text-[10px] font-extrabold uppercase tracking-[0.1em] text-white/75 sm:text-[11px]">
+          <Truck className="h-3.5 w-3.5 flex-shrink-0 text-[#7ef0ad]" />
+          <span className="truncate">Gratis ongkir wilayah tertentu</span>
+          <span className="hidden text-white/30 sm:inline">•</span>
+          <span className="hidden items-center gap-2 sm:inline-flex">
+            <ShieldCheck className="h-3.5 w-3.5 text-[#7ef0ad]" /> Garansi bibit hidup
+          </span>
         </div>
       </div>
 
-      {/* Mobile Navigation Menu */}
-      <AnimatePresence>
-        {isMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 overflow-hidden"
+      <nav
+        className={`border-b transition-colors duration-300 ${
+          scrolled
+            ? 'border-line bg-canvas/90 shadow-[0_10px_30px_-24px_rgb(16_36_26/0.5)] backdrop-blur-xl'
+            : 'border-transparent bg-canvas/70 backdrop-blur-md'
+        }`}
+      >
+        <div className="shell">
+          <div
+            className={`flex items-center justify-between gap-2 transition-all duration-300 ${
+              scrolled ? 'h-16' : 'h-16 md:h-20'
+            }`}
           >
-            <div className="px-4 py-4 space-y-2">
+            <Link to="/" className="flex shrink-0 items-center gap-2" aria-label="Sahid Tani — beranda">
+              <img
+                src="/logonavbarnobg.png"
+                alt="Logo Sahid Tani"
+                className={`w-auto object-contain transition-all duration-300 ${
+                  scrolled ? 'h-9 md:h-10' : 'h-10 md:h-12'
+                }`}
+              />
+            </Link>
+
+            {/* Navigasi desktop */}
+            <div className="hidden items-center gap-1 rounded-full border border-line/70 bg-surface/60 p-1 md:flex">
               {navLinks.map((link) => (
                 <Link
                   key={link.path}
                   to={link.path}
-                  onClick={() => setIsMenuOpen(false)}
-                  className="block text-base font-bold text-slate-800 dark:text-slate-200 hover:text-primary transition-colors px-4 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800"
+                  className={`inline-flex min-h-9 items-center rounded-full px-4 text-sm font-bold transition-colors ${
+                    isActive(link.path)
+                      ? 'bg-brand text-onbrand shadow-[0_8px_20px_-14px_var(--brand)]'
+                      : 'text-inksoft hover:bg-surface2 hover:text-ink'
+                  }`}
                 >
                   {link.name}
                 </Link>
               ))}
             </div>
-          </motion.div>
+
+            <div className="flex items-center gap-1 md:gap-1.5">
+              <button
+                onClick={toggle}
+                className="icon-btn"
+                aria-label={isDark ? 'Ganti ke mode terang' : 'Ganti ke mode gelap'}
+                title={isDark ? 'Mode terang' : 'Mode gelap'}
+              >
+                {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+              </button>
+
+              <button
+                onClick={onCartClick}
+                className="icon-btn relative"
+                aria-label={`Keranjang${cartCount > 0 ? `, ${cartCount} item` : ''}`}
+              >
+                <ShoppingCart className="h-5 w-5" />
+                {cartCount > 0 && (
+                  <span className="absolute -right-0.5 -top-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-brand px-1 text-[10px] font-extrabold text-onbrand ring-2 ring-canvas">
+                    {cartCount}
+                  </span>
+                )}
+              </button>
+
+              <a
+                href={WA_LINK}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-primary btn-sm ml-1 hidden lg:inline-flex"
+              >
+                <Phone className="h-4 w-4" /> Pesan Bibit
+              </a>
+
+              <button
+                onClick={() => setIsMenuOpen(true)}
+                className="icon-btn text-ink md:hidden"
+                aria-label="Buka menu"
+                aria-expanded={isMenuOpen}
+              >
+                <Menu className="h-6 w-6" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Menu HP: panel penuh dari kanan */}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <>
+            <motion.button
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMenuOpen(false)}
+              aria-label="Tutup menu"
+              className="fixed inset-0 z-40 bg-deep/55 backdrop-blur-sm md:hidden"
+            />
+            <motion.aside
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 30, stiffness: 260 }}
+              className="fixed inset-y-0 right-0 z-50 flex w-[84%] max-w-xs flex-col border-l border-line bg-canvas px-5 pt-5 safe-bottom md:hidden"
+            >
+              <div className="flex items-center justify-between">
+                <span className="eyebrow">Menu</span>
+                <button
+                  onClick={() => setIsMenuOpen(false)}
+                  className="icon-btn"
+                  aria-label="Tutup menu"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              <nav className="mt-6 flex flex-col gap-1">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    className={`flex min-h-13 items-center gap-3 rounded-2xl px-4 text-base font-bold transition-colors ${
+                      isActive(link.path)
+                        ? 'bg-brandsoft text-brand'
+                        : 'text-ink hover:bg-surface2'
+                    }`}
+                  >
+                    <link.icon className="h-[18px] w-[18px]" />
+                    {link.name}
+                  </Link>
+                ))}
+              </nav>
+
+              <div className="mt-auto space-y-3 border-t border-line pt-5">
+                <a
+                  href={WA_LINK}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-wa w-full"
+                >
+                  <Phone className="h-4 w-4" /> Tanya via WhatsApp
+                </a>
+                <button onClick={toggle} className="btn btn-outline w-full">
+                  {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                  {isDark ? 'Mode terang' : 'Mode gelap'}
+                </button>
+                <p className="pt-1 text-center text-xs text-inksoft">
+                  Bibit buah unggul · Salatiga
+                </p>
+              </div>
+            </motion.aside>
+          </>
         )}
       </AnimatePresence>
-    </nav>
+    </header>
   );
 };
 

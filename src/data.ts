@@ -1,6 +1,6 @@
-import { Product } from "./types";
+import { SeedProduct } from "./types";
 
-export const products: Product[] = [
+export const products: SeedProduct[] = [
   // Pepaya
   {
     id: 1,
@@ -78,7 +78,7 @@ export const products: Product[] = [
       "/durian/Musangking/musangking (1).jpg",
       "/durian/Musangking/musangking (2).jpg",
       "/durian/Musangking/musangking (3).jpg",
-      "/durian/Musangking/musangking(4).jpg",
+      "/durian/Musangking/musangking (4).jpg",
     ],
     category: "Durian",
     rating: 4.9,
@@ -280,7 +280,6 @@ export const products: Product[] = [
     images: [
       "/alpukat/mentega/alpukat mentega(1).jpg",
       "/alpukat/mentega/alpukat mentega(2).jpg",
-      "/alpukat/mentega/alpukat mentega(3).jpg",
     ],
     category: "Alpukat",
     rating: 4.6,

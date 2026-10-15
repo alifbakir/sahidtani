@@ -1,36 +1,413 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,900&display=swap');
 @import "tailwindcss";
 
 @variant dark (&:where(.dark, .dark *));
 
-@theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Playfair Display", serif;
-  --color-primary: #15803d; /* green-700 */
-  --color-secondary: #f0fdf4; /* green-50 */
+/* ============================================================
+   SISTEM DESAIN SAHID TANI
+   Satu sumber warna untuk toko dan panel admin.
+   Dipakai lewat utility Tailwind: bg-surface, text-ink, border-line, dst.
+   ============================================================ */
+
+:root {
+  /* --- permukaan --- */
+  --canvas: #f6f3ea;        /* kertas hangat, latar halaman */
+  --surface: #ffffff;       /* kartu / panel */
+  --surface-2: #efeade;     /* blok sekunder di dalam kartu */
+  --surface-3: #e6dfcd;     /* blok tersier, track, kerangka memuat */
+
+  /* --- teks --- */
+  --ink: #10241a;
+  --ink-soft: #55665b;
+  --ink-faint: #6d7d73;
+
+  /* --- garis --- */
+  --line: #ded5c2;
+  --line-strong: #cfc4ab;
+
+  /* --- merek --- */
+  --brand: #156a3e;
+  --brand-strong: #0c4b2b;
+  --brand-soft: #e2f1e7;
+  --brand-ring: rgb(21 106 62 / 0.18);
+  --on-brand: #ffffff;
+
+  /* --- aksen tanah --- */
+  --accent: #a35a12;
+  --accent-soft: #fbefd9;
+
+  /* --- promo & status --- */
+  --promo: #c23a2c;
+  --promo-soft: #fdeae7;
+  --success: #14713f;
+  --success-soft: #e2f1e7;
+  --warn: #a05c08;
+  --warn-soft: #fbeed6;
+  --danger: #b3382a;
+  --danger-soft: #fbe9e6;
+  --info: #1f5e8c;
+  --info-soft: #e6f0f8;
+
+  /* --- bilah gelap (hero, footer) --- */
+  --deep: #06170f;
+  --deep-2: #0b2a1c;
+  --on-deep: #ffffff;
+  --on-deep-soft: rgb(255 255 255 / 0.72);
+  --deep-line: rgb(255 255 255 / 0.12);
+}
+
+.dark {
+  --canvas: #08150f;
+  --surface: #0f2118;
+  --surface-2: #152b20;
+  --surface-3: #1c3527;
+
+  --ink: #edf5ef;
+  --ink-soft: #a3b8aa;
+  --ink-faint: #7f9487;
+
+  --line: #1f3a2c;
+  --line-strong: #2b4d3a;
+
+  /* Di mode gelap warna merek jadi terang, jadi teks di atasnya harus gelap. */
+  --brand: #48d98a;
+  --brand-strong: #7ef0ad;
+  --brand-soft: #10301f;
+  --brand-ring: rgb(72 217 138 / 0.22);
+  --on-brand: #06251a;
+
+  --accent: #f0b45c;
+  --accent-soft: #38280b;
+
+  --promo: #fb7b85;
+  --promo-soft: #3a161c;
+  --success: #4ad98c;
+  --success-soft: #10301f;
+  --warn: #f0b45c;
+  --warn-soft: #38280b;
+  --danger: #fb8f86;
+  --danger-soft: #3a1a18;
+  --info: #7cc4ef;
+  --info-soft: #102a3a;
+
+  --deep: #04100b;
+  --deep-2: #0b2a1c;
+  --on-deep: #ffffff;
+  --on-deep-soft: rgb(255 255 255 / 0.68);
+  --deep-line: rgb(255 255 255 / 0.1);
+}
+
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface2: var(--surface-2);
+  --color-surface3: var(--surface-3);
+  --color-ink: var(--ink);
+  --color-inksoft: var(--ink-soft);
+  --color-inkfaint: var(--ink-faint);
+  --color-line: var(--line);
+  --color-linestrong: var(--line-strong);
+
+  --color-brand: var(--brand);
+  --color-brandstrong: var(--brand-strong);
+  --color-brandsoft: var(--brand-soft);
+  --color-onbrand: var(--on-brand);
+
+  --color-accent: var(--accent);
+  --color-accentsoft: var(--accent-soft);
+  --color-promo: var(--promo);
+  --color-promosoft: var(--promo-soft);
+
+  --color-success: var(--success);
+  --color-successsoft: var(--success-soft);
+  --color-warn: var(--warn);
+  --color-warnsoft: var(--warn-soft);
+  --color-danger: var(--danger);
+  --color-dangersoft: var(--danger-soft);
+  --color-info: var(--info);
+  --color-infosoft: var(--info-soft);
+
+  --color-deep: var(--deep);
+  --color-deep2: var(--deep-2);
+  --color-ondeep: var(--on-deep);
+  --color-ondeepsoft: var(--on-deep-soft);
+
+  /* Nama lama tetap dipetakan supaya sisa kode yang belum disentuh ikut berubah. */
+  --color-primary: var(--brand);
+  --color-secondary: var(--brand-soft);
+
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-serif: "Fraunces", "Playfair Display", Georgia, serif;
+
+  --radius-card: 1.5rem;
+  --radius-xl2: 2rem;
+  --shadow-soft: 0 1px 2px rgb(16 36 26 / 0.04), 0 10px 26px -14px rgb(16 36 26 / 0.2);
+  --shadow-lift: 0 2px 4px rgb(16 36 26 / 0.05), 0 26px 50px -26px rgb(16 36 26 / 0.32);
+
+  --animate-shimmer: shimmer 1.6s ease-in-out infinite;
+  --animate-card-masuk: card-masuk 0.5s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+@keyframes shimmer {
+  0% { background-position: -160% 0; }
+  100% { background-position: 260% 0; }
+}
+
+@keyframes card-masuk {
+  from { opacity: 0; transform: translate3d(0, 14px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
 @layer base {
-  :root {
-    --bg-main: #ffffff;
-    --text-main: #0f172a; /* slate-900 */
-    --border-main: #f1f5f9; /* slate-100 */
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+    scroll-padding-top: 6rem;
   }
 
-  .dark {
-    --bg-main: #0f172a; /* slate-900 */
-    --text-main: #f8fafc; /* slate-50 */
-    --border-main: #1e293b; /* slate-800 */
-    --color-secondary: #064e3b; /* emerald-950 */
+  body {
+    background-color: var(--canvas);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-synthesis-weight: none;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    overflow-x: hidden;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Di HP, kolom teks panjang tetap nyaman dibaca. */
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: var(--brand);
+    color: var(--on-brand);
+  }
+
+  h1, h2, h3, h4 {
+    text-wrap: balance;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+    border-radius: 0.6rem;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--line-strong) transparent;
+  }
+
+  input, select, textarea, button {
+    font: inherit;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      transition-duration: 0.001ms !important;
+    }
+    /* Jeda bertahap tidak berguna kalau animasinya dimatikan. */
+    .card-masuk { animation-delay: 0ms !important; }
   }
 }
 
-html {
-  scroll-behavior: smooth;
-}
+@layer components {
+  /* Wadah halaman yang konsisten di semua ukuran layar */
+  .shell {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
 
-body {
-  @apply font-sans transition-colors duration-300;
-  background-color: var(--bg-main);
-  color: var(--text-main);
+  .shell-tight {
+    @apply mx-auto w-full max-w-3xl px-4 sm:px-6;
+  }
+
+  /* Jarak antar bagian: lega di desktop, hemat di HP */
+  .section {
+    @apply py-14 md:py-24;
+  }
+
+  .eyebrow {
+    @apply inline-flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.18em] text-brand;
+  }
+
+  .display {
+    @apply font-serif font-bold leading-[1.05] tracking-[-0.02em];
+  }
+
+  /* Judul bagian: dipakai berulang di toko, jadi disatukan di sini. */
+  .h-section {
+    @apply font-serif font-bold leading-tight tracking-[-0.02em]
+           text-[1.6rem] text-ink sm:text-3xl md:text-4xl;
+  }
+
+  /* ---------------------------------------------------------------
+     Tombol: .btn = dasar (tinggi min 44px), modifier dipakai bersama.
+     Contoh: class="btn btn-primary"
+     --------------------------------------------------------------- */
+  .btn {
+    @apply inline-flex min-h-11 select-none items-center justify-center gap-2 rounded-full px-5 py-2.5
+           text-sm font-bold transition-all duration-200 active:scale-[0.98]
+           disabled:pointer-events-none disabled:opacity-50;
+  }
+
+  .btn-lg {
+    @apply min-h-13 px-7 text-[15px];
+  }
+
+  .btn-sm {
+    @apply min-h-9 gap-1.5 px-4 py-2 text-[13px];
+  }
+
+  .btn-primary {
+    @apply bg-brand text-onbrand shadow-[0_10px_24px_-14px_var(--brand)] hover:bg-brandstrong;
+  }
+
+  .btn-dark {
+    @apply bg-ink text-canvas hover:opacity-90;
+  }
+
+  .btn-outline {
+    @apply border border-line bg-surface text-ink hover:border-brand hover:text-brand;
+  }
+
+  .btn-soft {
+    @apply bg-brandsoft text-brand hover:bg-brand/15;
+  }
+
+  .btn-wa {
+    @apply bg-[#25D366] text-[#062b17] hover:brightness-105;
+  }
+
+  .btn-ghost {
+    @apply text-inksoft hover:bg-surface2 hover:text-ink;
+  }
+
+  .btn-danger {
+    @apply bg-dangersoft text-danger hover:bg-danger hover:text-white;
+  }
+
+  /* Tombol ikon bulat */
+  .icon-btn {
+    @apply grid h-10 w-10 flex-shrink-0 place-items-center rounded-full text-inksoft
+           transition-colors hover:bg-surface2 hover:text-ink;
+  }
+
+  /* ---------------------------------------------------------- KARTU */
+  .card {
+    @apply rounded-[var(--radius-card)] border border-line bg-surface shadow-[var(--shadow-soft)];
+  }
+
+  .panel {
+    @apply rounded-[var(--radius-card)] border border-line bg-surface p-5 md:p-6;
+  }
+
+  .panel-title {
+    @apply flex items-center gap-2 text-sm font-extrabold text-ink md:text-base;
+  }
+
+  /* Chip filter: .chip + .chip-active */
+  .chip {
+    @apply inline-flex min-h-10 items-center gap-2 whitespace-nowrap rounded-full border border-line bg-surface
+           px-4 text-[13px] font-bold text-inksoft transition-colors hover:border-brand hover:text-brand;
+  }
+
+  .chip-active {
+    @apply border-brand bg-brand text-onbrand hover:text-onbrand;
+  }
+
+  .field {
+    @apply w-full rounded-2xl border border-line bg-surface px-4 py-3 text-sm text-ink
+           placeholder:text-inkfaint focus:border-brand focus:outline-none
+           focus:ring-4 focus:ring-[var(--brand-ring)];
+  }
+
+  .field-label {
+    @apply mb-2 block text-[11px] font-extrabold uppercase tracking-[0.14em] text-inksoft;
+  }
+
+  .field-hint {
+    @apply mt-2 text-[11px] leading-relaxed text-inkfaint;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-extrabold uppercase tracking-wide;
+  }
+
+  /* Kotak pesan sistem (sukses / gagal / info) */
+  .alert {
+    @apply flex items-start gap-2.5 rounded-2xl px-4 py-3 text-sm font-bold;
+  }
+
+  /* Baris daftar di panel admin */
+  .row {
+    @apply flex items-center gap-3 border-b border-line px-4 py-4 last:border-b-0 md:gap-4 md:px-5;
+  }
+
+  .row-hover {
+    @apply transition-colors hover:bg-surface2/60;
+  }
+
+  /* Baris chip yang bisa digeser di HP tanpa scrollbar terlihat */
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Ruang aman untuk notch / bilah bawah iPhone pada elemen lengket */
+  .safe-bottom {
+    padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
+  }
+
+  /* Ruang ekstra di bawah supaya konten tidak tertutup navigasi HP */
+  .pb-mobilenav {
+    padding-bottom: calc(5.75rem + env(safe-area-inset-bottom));
+  }
+
+  .hover-lift {
+    @apply transition-all duration-300 md:hover:-translate-y-1 md:hover:shadow-[var(--shadow-lift)];
+  }
+
+  /*
+   * Kartu katalog muncul berurutan. Sengaja animasi CSS murni (bukan JS
+   * per frame) supaya tetap ringan walau puluhan kartu tampil sekaligus.
+   * Jeda diatur lewat variabel --masuk: 0..8 (dibatasi supaya kartu
+   * paling bawah tidak menunggu terlalu lama).
+   */
+  .card-masuk {
+    animation: var(--animate-card-masuk);
+    animation-delay: calc(var(--masuk, 0) * 35ms);
+  }
+
+  /* Kerangka memuat */
+  .skeleton {
+    @apply rounded-2xl bg-surface2;
+    background-image: linear-gradient(
+      100deg,
+      transparent 20%,
+      color-mix(in oklab, var(--surface) 70%, transparent) 45%,
+      transparent 70%
+    );
+    background-size: 220% 100%;
+    animation: var(--animate-shimmer);
+  }
+
+  /* Selimut gelap untuk bagian berfoto */
+  .veil {
+    background: linear-gradient(
+      180deg,
+      rgb(6 23 15 / 0.82) 0%,
+      rgb(6 23 15 / 0.66) 45%,
+      rgb(6 23 15 / 0.92) 100%
+    );
+  }
+
+  .link-quiet {
+    @apply inline-flex min-h-10 items-center gap-1 text-ondeepsoft transition-colors hover:text-white;
+  }
 }
