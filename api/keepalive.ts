@@ -6,8 +6,15 @@
  * sudah cukup untuk mencegahnya.
  */
 export default async function handler(_req: any, res: any): Promise<void> {
-  const url = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-  const key = process.env.VITE_SUPABASE_ANON_KEY;
+  // Cadangan di bawah ini adalah konfigurasi PUBLIK Supabase: URL project dan
+  // anon/publishable key. Anon key memang selalu ikut terkirim ke browser dan
+  // dilindungi Row Level Security, jadi aman ditulis di repo. Yang TIDAK boleh
+  // ada di repo adalah SUPABASE_SERVICE_ROLE_KEY.
+  const url =
+    process.env.VITE_SUPABASE_URL ||
+    process.env.SUPABASE_URL ||
+    'https://goayauqpwrluofncshec.supabase.co';
+  const key = process.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_iGdfrxa01AkFzSwAN9NzDg_RTq4raxt';
 
   if (!url || !key) {
     res.status(500).json({ ok: false, reason: 'VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY belum diisi' });

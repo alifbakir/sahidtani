@@ -6,6 +6,7 @@ coverage/
 *.log
 .env*
 !.env.example
+!.env.production
 
 # Kumpulan skill komunitas (1547 folder, 74 MB) untuk referensi lokal saja.
 # Tidak ikut repo supaya git clone dan deploy tetap ringan.
