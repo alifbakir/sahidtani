@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Cart from './components/Cart';
 import MobileNav from './components/MobileNav';
+import PwaInstall from './components/PwaInstall';
 import Home from './pages/Home';
 import About from './pages/About';
 import Products from './pages/Products';
@@ -86,6 +87,9 @@ const Shell: React.FC<ShellProps> = ({
       )}
 
       {pakaiMobileNav && <MobileNav cartCount={cartCount} onCartClick={onCartOpen} />}
+
+      {/* Ajakan memasang app (PWA) — tidak muncul di panel admin. */}
+      {!isAdminArea && <PwaInstall />}
     </div>
   );
 };
