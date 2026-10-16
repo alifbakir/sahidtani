@@ -1,7 +1,33 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
-import { defineConfig } from 'vite';
+import { fileURLToPath } from 'node:url';
+import { defineConfig, type Plugin } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
+
+const akar = fileURLToPath(new URL('.', import.meta.url));
+
+/**
+ * vite-plugin-pwa menyuntikkan <link rel="manifest" href="/manifest.webmanifest">
+ * (manifest toko) ke SETIAP berkas HTML. Untuk admin.html itu salah: halaman
+ * admin harus menunjuk manifest admin, karena iOS memakai start_url dari
+ * manifest halaman yang sedang dibuka saat "Tambah ke Layar Utama".
+ * Plugin kecil ini membuang suntikan tersebut khusus dari admin.html, jadi
+ * yang tersisa hanya manifest admin yang ditulis sendiri di berkas itu.
+ */
+const adminPakaiManifestSendiri = (): Plugin => ({
+  name: 'admin-pakai-manifest-sendiri',
+  enforce: 'post',
+  transformIndexHtml: {
+    order: 'post',
+    handler(html, ctx) {
+      if (!ctx.filename.endsWith('admin.html')) return html;
+      return html.replace(
+        /<link rel="manifest" href="\/manifest\.webmanifest"[^>]*>/g,
+        '<!-- manifest toko sengaja dibuang di halaman admin -->',
+      );
+    },
+  },
+});
 
 /**
  * Konfigurasi PWA Sahid Tani.
@@ -70,11 +96,32 @@ export default defineConfig({
         // webmanifest ikut supaya manifest admin tetap ada saat offline.
         globPatterns: ['**/*.{js,css,html,ico,svg,woff,woff2,png,webmanifest}'],
         navigateFallback: '/index.html',
-        // Panggilan API jangan pernah dijawab index.html.
-        navigateFallbackDenylist: [/^\/api\//],
+        // Navigasi ke area admin TIDAK boleh dijawab index.html (manifest toko).
+        // Alasannya: iOS memakai start_url manifest dari dokumen yang benar-benar
+        // dilayani, jadi /admin harus tetap sampai ke server dan menerima
+        // admin.html. Rute runtimeCaching pertama di bawah yang mengurusnya.
+        navigateFallbackDenylist: [/^\/api\//, /^\/admin/],
         cleanupOutdatedCaches: true,
         clientsClaim: true,
         runtimeCaching: [
+          {
+            // Halaman admin: ambil admin.html asli dari server (manifest admin),
+            // salinannya disimpan supaya panel tetap terbuka saat offline.
+            urlPattern: ({ request, url }: { request: Request; url: URL }) =>
+              request.mode === 'navigate' &&
+              (url.pathname === '/admin' || url.pathname.startsWith('/admin/')),
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'halaman-admin',
+              networkTimeoutSeconds: 4,
+              expiration: {
+                maxEntries: 20,
+                maxAgeSeconds: 60 * 60 * 24 * 7,
+                purgeOnQuotaError: true,
+              },
+              cacheableResponse: { statuses: [200] },
+            },
+          },
           {
             // Foto produk dari Supabase Storage (termasuk endpoint pengecilan
             // /render/image). Sekali diunduh, foto langsung tampil walau
@@ -128,7 +175,17 @@ export default defineConfig({
       // Service worker hanya aktif di build produksi, bukan saat `npm run dev`.
       devOptions: { enabled: false },
     }),
+    adminPakaiManifestSendiri(),
   ],
+  build: {
+    rollupOptions: {
+      // Dua halaman terpisah: toko (index.html) dan panel admin (admin.html).
+      input: {
+        main: `${akar}index.html`,
+        admin: `${akar}admin.html`,
+      },
+    },
+  },
   server: {
     // Kalau watching bikin layar berkedip, jalankan dev dengan DISABLE_HMR=true.
     hmr: process.env.DISABLE_HMR !== 'true',

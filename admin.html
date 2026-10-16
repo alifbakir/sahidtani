@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+
+    <!--
+      Halaman ini KHUSUS panel admin dan sengaja dipisah dari index.html.
+      Alasannya: saat "Tambah ke Layar Utama" di iOS, sistem membaca start_url
+      dari manifest halaman yang sedang dibuka. Kalau /admin memakai index.html
+      (manifest toko, start_url "/"), ikon yang dipasang akan membuka toko —
+      bukan panel admin. Dengan HTML sendiri, /admin langsung menunjuk
+      /admin.webmanifest sejak dari server, tanpa bergantung pada JavaScript.
+    -->
+    <link rel="manifest" href="/admin.webmanifest" />
+    <link rel="icon" type="image/png" href="/icons/admin-192x192.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#156a3e" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#08150f" media="(prefers-color-scheme: dark)" />
+    <meta
+      name="description"
+      content="Panel admin Sahid Tani: kelola produk, harga, stok, dan kategori bibit."
+    />
+    <title>Sahid Tani Admin</title>
+    <link rel="apple-touch-icon" href="/icons/admin-apple-touch-icon.png" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Sahid Tani Admin" />
+    <script>
+      // Pasang tema sebelum halaman digambar supaya tidak berkedip putih di mode gelap.
+      (function () {
+        try {
+          var t = localStorage.getItem('theme');
+          if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

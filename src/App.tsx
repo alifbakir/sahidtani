@@ -93,8 +93,9 @@ const Shell: React.FC<ShellProps> = ({
 
       {pakaiMobileNav && <MobileNav cartCount={cartCount} onCartClick={onCartOpen} />}
 
-      {/* Ajakan memasang app (PWA) — tidak muncul di panel admin. */}
-      {!isAdminArea && <PwaInstall />}
+      {/* Ajakan memasang app (PWA). Dua aplikasi: toko di halaman publik,
+          panel admin di area /admin — masing-masing punya ikon sendiri. */}
+      <PwaInstall mode={isAdminArea ? 'admin' : 'toko'} />
     </div>
   );
 };

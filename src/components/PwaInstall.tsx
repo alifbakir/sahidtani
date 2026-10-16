@@ -17,7 +17,28 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }
 
-const KUNCI_TOLAK = 'sahidTaniTolakPasang';
+interface PwaInstallProps {
+  /** Aplikasi mana yang ditawarkan: toko (pembeli) atau admin (pengelola). */
+  mode?: 'toko' | 'admin';
+}
+
+const KONTEN = {
+  toko: {
+    kunciTolak: 'sahidTaniTolakPasang',
+    ikon: '/icons/pwa-192x192.png',
+    judul: 'Pasang aplikasi Sahid Tani',
+    keterangan: 'Buka katalog lebih cepat dari layar utama, tanpa perlu unduh dari toko aplikasi.',
+    posisi: 'inset-x-3 bottom-24 md:inset-x-auto md:right-6 md:bottom-6 md:w-80',
+  },
+  admin: {
+    kunciTolak: 'sahidTaniTolakPasangAdmin',
+    ikon: '/icons/admin-192x192.png',
+    judul: 'Pasang aplikasi admin',
+    keterangan:
+      'Ikon terpisah di layar utama yang langsung membuka /admin — tanpa mengetik alamatnya.',
+    posisi: 'inset-x-3 bottom-4 md:inset-x-auto md:right-6 md:bottom-6 md:w-80',
+  },
+} as const;
 
 /** Sudah dibuka sebagai aplikasi terpasang? */
 function sudahTerpasang(): boolean {
@@ -34,14 +55,19 @@ function penggunaIos(): boolean {
   return /iPad|iPhone|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
 }
 
-const PwaInstall: React.FC = () => {
+const PwaInstall: React.FC<PwaInstallProps> = ({ mode = 'toko' }) => {
+  const isi = KONTEN[mode];
   const [prompt, setPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [tampil, setTampil] = useState(false);
   const [caraIos, setCaraIos] = useState(false);
 
   useEffect(() => {
+    setTampil(false);
+    setCaraIos(false);
+    setPrompt(null);
+
     if (sudahTerpasang()) return;
-    if (localStorage.getItem(KUNCI_TOLAK) === '1') return;
+    if (localStorage.getItem(isi.kunciTolak) === '1') return;
 
     const onPrompt = (event: Event) => {
       event.preventDefault();
@@ -71,12 +97,12 @@ const PwaInstall: React.FC = () => {
       window.removeEventListener('appinstalled', onTerpasang);
       if (timer) window.clearTimeout(timer);
     };
-  }, []);
+  }, [isi.kunciTolak]);
 
   const tutup = () => {
     setTampil(false);
-    // Jangan terus-menerus mengganggu pengunjung yang sudah menolak.
-    localStorage.setItem(KUNCI_TOLAK, '1');
+    // Jangan terus-menerus mengganggu orang yang sudah menolak.
+    localStorage.setItem(isi.kunciTolak, '1');
   };
 
   const pasang = async () => {
