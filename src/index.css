@@ -411,3 +411,40 @@
     @apply inline-flex min-h-10 items-center gap-1 text-ondeepsoft transition-colors hover:text-white;
   }
 }
+
+/* ============================================================
+   ANTI-ZOOM SAAT MENGETIK DI HP
+
+   Safari di iPhone (dan sebagian browser Android) memperbesar
+   seluruh halaman begitu kolom isian difokuskan kalau ukuran
+   hurufnya di bawah 16px. Itu sebabnya menekan kolom pencarian
+   membuat tampilan melompat/zoom.
+
+   Solusinya: semua kolom isian dibuat minimal 16px, TAPI hanya di
+   perangkat sentuh (pointer: coarse) — di desktop tampilannya
+   tidak berubah. Aturan ini sengaja ditulis di luar @layer supaya
+   menang dari utility Tailwind seperti text-sm di .field.
+   ============================================================ */
+@media (pointer: coarse) {
+  .field,
+  input:not([type='checkbox']):not([type='radio']):not([type='file']):not([type='range']),
+  select,
+  textarea {
+    font-size: 16px;
+  }
+
+  /*
+   * Sentuhan ganda pada kolom isian juga bisa memicu zoom di iOS.
+   * touch-action: manipulation mematikan zoom ketuk-dua-kali, tapi
+   * tetap mengizinkan geser dan cubit (pinch) seperti biasa.
+   */
+  a,
+  button,
+  label,
+  [role='button'],
+  input,
+  select,
+  textarea {
+    touch-action: manipulation;
+  }
+}

@@ -13,7 +13,7 @@ const AdminLogin: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="grid min-h-screen place-items-center bg-canvas">
+      <div className="grid min-h-dvh place-items-center bg-canvas">
         <Loader2 className="h-7 w-7 animate-spin text-brand" />
       </div>
     );
@@ -36,7 +36,7 @@ const AdminLogin: React.FC = () => {
   };
 
   return (
-    <div className="grid min-h-screen bg-canvas lg:grid-cols-2">
+    <div className="grid min-h-dvh bg-canvas lg:grid-cols-2">
       {/* Sisi merek, hanya tampil di layar lebar */}
       <aside className="relative hidden overflow-hidden bg-deep lg:flex lg:flex-col lg:justify-between lg:p-12">
         <div className="pointer-events-none absolute -right-24 top-10 h-72 w-72 rounded-full bg-[#7ef0ab]/15 blur-3xl" />

@@ -37,7 +37,7 @@ const AdminLayout: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="grid min-h-screen place-items-center bg-canvas">
+      <div className="grid min-h-dvh place-items-center bg-canvas">
         <div className="flex flex-col items-center gap-3">
           <Loader2 className="h-7 w-7 animate-spin text-brand" />
           <p className="text-sm text-inksoft">Memuat panel admin…</p>
@@ -48,7 +48,7 @@ const AdminLayout: React.FC = () => {
 
   if (!isSupabaseConfigured) {
     return (
-      <div className="grid min-h-screen place-items-center bg-canvas px-4">
+      <div className="grid min-h-dvh place-items-center bg-canvas px-4">
         <div className="panel max-w-md text-center">
           <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-warnsoft text-warn">
             <AlertCircle className="h-7 w-7" />
@@ -97,7 +97,7 @@ const AdminLayout: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-canvas">
+    <div className="min-h-dvh bg-canvas">
       {/* ------------------------------------------------------- HEADER */}
       <header className="sticky top-0 z-40 border-b border-line bg-surface/90 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-[100rem] items-center gap-3 px-4 sm:px-6 lg:px-8">

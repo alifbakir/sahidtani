@@ -121,7 +121,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onAddToCart }) => {
 
   if (error || !product) {
     return (
-      <div className="flex min-h-screen items-center justify-center px-4 pt-24">
+      <div className="flex min-h-dvh items-center justify-center px-4 pt-24">
         <div className="card max-w-md p-8 text-center">
           <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-promosoft text-promo">
             <AlertCircle className="h-7 w-7" />

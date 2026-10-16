@@ -55,7 +55,7 @@ const Shell: React.FC<ShellProps> = ({
   useManifestAplikasi(isAdminArea ? '/admin.webmanifest' : '/manifest.webmanifest');
 
   return (
-    <div className="min-h-screen bg-canvas font-sans text-ink">
+    <div className="min-h-dvh bg-canvas font-sans text-ink">
       {!isAdminArea && <Navbar cartCount={cartCount} onCartClick={onCartOpen} />}
 
       <div className={pakaiMobileNav ? 'pb-mobilenav md:pb-0' : undefined}>
