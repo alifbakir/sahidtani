@@ -1,0 +1,102 @@
+name: Jaga Supabase tetap bangun
+
+# Supabase Free menjeda project setelah 7 hari tanpa aktivitas database.
+# Vercel sudah punya cron harian ke /api/keepalive, TAPI kalau deployment
+# diproteksi (Vercel Authentication), cron itu kena HTTP 302 dan — menurut
+# dokumen Vercel — cron tidak mengikuti redirect, jadi pekerjaannya berhenti
+# tanpa jejak di log. Karena itu lapisan ini dibuat berdiri sendiri: ia
+# memanggil Supabase langsung dari GitHub, tanpa lewat Vercel sama sekali.
+
+on:
+  schedule:
+    # Setiap hari 04:17 UTC = 11:17 WIB.
+    - cron: '17 4 * * *'
+  # Ikut jalan saat berkas ini diubah, supaya perubahannya bisa langsung
+  # diuji dari tab Actions tanpa menunggu jadwal.
+  push:
+    paths:
+      - '.github/workflows/supabase-keepalive.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: supabase-keepalive
+  cancel-in-progress: false
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Panggil Supabase (aktivitas database)
+        run: |
+          set -euo pipefail
+          # .env.production berisi konfigurasi PUBLIK (URL + anon/publishable
+          # key) dan memang ikut repo, jadi tidak perlu secret tambahan.
+          set -a
+          . ./.env.production
+          set +a
+          url="${VITE_SUPABASE_URL:?VITE_SUPABASE_URL kosong di .env.production}"
+          key="${VITE_SUPABASE_ANON_KEY:?VITE_SUPABASE_ANON_KEY kosong di .env.production}"
+
+          gagal=0
+          for tabel in products categories; do
+            kode=$(curl -sS --max-time 30 --retry 2 --retry-delay 3 \
+              -o /tmp/hasil.json -w '%{http_code}' \
+              -H "apikey: $key" \
+              "$url/rest/v1/$tabel?select=id&limit=1")
+            baris=$(grep -c '"id"' /tmp/hasil.json || true)
+            echo "$tabel -> HTTP $kode (baris terlihat: $baris)"
+            [ "$kode" = "200" ] || gagal=1
+          done
+
+          # Auth dibangunkan juga supaya bukan hanya jalur REST.
+          kode=$(curl -sS --max-time 30 -o /dev/null -w '%{http_code}' \
+            -H "apikey: $key" "$url/auth/v1/health")
+          echo "auth/health -> HTTP $kode"
+          [ "$kode" = "200" ] || gagal=1
+
+          if [ "$gagal" != "0" ]; then
+            echo "::error::Supabase tidak merespons seperti seharusnya. Cek dashboard Supabase — mungkin project sedang dijeda dan perlu di-restore."
+            exit 1
+          fi
+          echo "Supabase bangun dan melayani query."
+
+      - name: Laporan status cron Vercel (informatif saja)
+        run: |
+          set -uo pipefail
+          kode=$(curl -sS --max-time 20 -o /dev/null -w '%{http_code}' \
+            "https://sahidtani-alifbakirs-projects.vercel.app/api/keepalive" || echo "gagal")
+          echo "Vercel /api/keepalive -> HTTP $kode"
+          if [ "$kode" = "302" ] || [ "$kode" = "401" ] || [ "$kode" = "403" ]; then
+            echo "::warning::Endpoint Vercel masih di balik proteksi deployment (HTTP $kode). Cron Vercel tidak bisa memanggilnya; lapisan GitHub Actions inilah yang menjaga Supabase tetap bangun. Matikan proteksi itu di Vercel (Settings → Deployment Protection) kalau ingin cron Vercel ikut bekerja — sekaligus supaya pengunjung bisa memasang PWA-nya."
+          fi
+
+      - name: Denyut bulanan (agar jadwal tidak dimatikan GitHub)
+        if: github.event_name == 'schedule'
+        run: |
+          set -euo pipefail
+          # GitHub menonaktifkan workflow terjadwal di repo publik kalau 60 hari
+          # tidak ada aktivitas repo. Satu commit kecil tiap tanggal 1 sudah
+          # cukup untuk menjaga jadwal ini tetap hidup.
+          if [ "$(date -u +%d)" != "01" ]; then
+            echo "Bukan tanggal 1 — tidak perlu commit denyut."
+            exit 0
+          fi
+          berkas=.github/keepalive/heartbeat.txt
+          mkdir -p "$(dirname "$berkas")"
+          echo "Denyut terakhir: $(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$berkas"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$berkas"
+          if git diff --cached --quiet; then
+            echo "Tidak ada perubahan."
+            exit 0
+          fi
+          git commit -m "chore: denyut bulanan agar jadwal keep-alive Supabase tetap aktif"
+          git pull --rebase --autostash origin main
+          git push origin HEAD:main

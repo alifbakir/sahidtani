@@ -4,6 +4,11 @@
  * Tujuannya menjaga project Supabase free tetap "bangun". Supabase menjeda
  * project free setelah 7 hari tanpa aktivitas; satu query kecil per hari
  * sudah cukup untuk mencegahnya.
+ *
+ * Catatan penting: kalau deployment ini diproteksi (Vercel Authentication),
+ * permintaan cron kena HTTP 302 dan cron Vercel tidak mengikuti redirect,
+ * jadi fungsi ini tidak pernah benar-benar dijalankan. Lapisan cadangan yang
+ * tidak lewat Vercel ada di .github/workflows/supabase-keepalive.yml.
  */
 export default async function handler(_req: any, res: any): Promise<void> {
   // Cadangan di bawah ini adalah konfigurasi PUBLIK Supabase: URL project dan
