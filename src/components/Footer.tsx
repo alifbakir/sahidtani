@@ -158,12 +158,11 @@ const Footer = () => (
         </div>
       </div>
 
-      <div className="mt-12 flex flex-col items-center gap-2 border-t border-white/10 pt-8 text-center text-xs text-white/45 md:flex-row md:justify-between md:text-left">
+      <div className="mt-12 flex flex-col items-center gap-2 border-t border-white/10 pt-8 text-center text-xs text-white/45">
         <p className="inline-flex items-center gap-2">
           <Sprout className={`h-4 w-4 ${glow}`} />
           &copy; {new Date().getFullYear()} Sahid Tani — Pusat Bibit Buah Unggul
         </p>
-        <p>Dibuat oleh Alif Al Fatah Putra &amp; Cornelius Johan Septian Wira Pratama</p>
       </div>
     </div>
   </footer>
