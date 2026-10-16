@@ -348,7 +348,7 @@ const AdminProductForm: React.FC = () => {
         <input
           ref={fileInput}
           type="file"
-          accept="image/*"
+          accept="image/*,.heic,.heif,image/heic,image/heif"
           multiple
           className="hidden"
           onChange={(e) => void handleFiles(e.target.files)}
@@ -364,7 +364,8 @@ const AdminProductForm: React.FC = () => {
             {uploading ? 'Mengunggah & mengompres foto…' : 'Ketuk untuk pilih foto (bisa banyak sekaligus)'}
           </span>
           <span className="text-[10px] text-inkfaint">
-            Foto otomatis dikompres ke maksimal 1600px supaya hemat kuota
+            Foto otomatis dikompres ke maksimal 1600px. Foto HEIC/HEIF dari kamera HP
+            (Samsung/iPhone) otomatis diubah jadi JPG.
           </span>
         </button>
       </section>

@@ -2,13 +2,25 @@
  * Kompres foto di browser sebelum diupload.
  * Ini penting: foto dari HP bisa 4-8 MB, sedangkan kuota gratis Supabase
  * hanya 1 GB storage dan 5 GB bandwidth. Setelah dikompres jadi ~150-400 KB.
+ *
+ * Foto HEIC/HEIF (bawaan kamera Samsung & iPhone) tidak bisa digambar ke
+ * canvas oleh Chrome/Android, jadi dikonversi dulu ke JPG.
  */
 export async function resizeImage(file: File, maxSize = 1600, quality = 0.82): Promise<Blob> {
-  if (!file.type.startsWith('image/')) {
+  const heic = await berkasHeic(file);
+  if (!heic && !file.type.startsWith('image/')) {
     throw new Error(`File "${file.name}" bukan gambar.`);
   }
 
-  const image = await loadImage(file);
+  let image: HTMLImageElement;
+  try {
+    // Safari bisa membuka HEIC sendiri, jadi dicoba dulu — konverter libheif
+    // (sekitar 0,8 MB) baru diunduh kalau browser memang tidak sanggup.
+    image = await loadImage(file);
+  } catch (err) {
+    if (!heic) throw err;
+    image = await loadImage(await ubahHeicKeJpeg(file));
+  }
   const scale = Math.min(1, maxSize / Math.max(image.width, image.height));
   const width = Math.max(1, Math.round(image.width * scale));
   const height = Math.max(1, Math.round(image.height * scale));
@@ -32,17 +44,60 @@ export async function resizeImage(file: File, maxSize = 1600, quality = 0.82): P
   return blob;
 }
 
-function loadImage(file: File): Promise<HTMLImageElement> {
+function loadImage(file: Blob & { name?: string }): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const objectUrl = URL.createObjectURL(file);
     const image = new Image();
     image.onload = () => resolve(image);
     image.onerror = () => {
       URL.revokeObjectURL(objectUrl);
-      reject(new Error(`Gambar "${file.name}" tidak bisa dibaca. Coba format JPG atau PNG.`));
+      const nama = file.name ?? 'foto';
+      reject(new Error(`Gambar "${nama}" tidak bisa dibaca browser. Coba format JPG atau PNG.`));
     };
     image.src = objectUrl;
   });
+}
+
+/** Merek di dalam kotak 'ftyp' yang menandakan berkas HEIC/HEIF. */
+const MEREK_HEIC = ['heic', 'heix', 'hevc', 'hevx', 'heim', 'heis', 'hevm', 'hevs', 'mif1', 'msf1'];
+
+/**
+ * Apakah berkas ini HEIC/HEIF? Diperiksa dari tipe MIME, nama berkas, lalu
+ * 12 byte pertama (kotak 'ftyp') sebagai cadangan — sebagian HP mengirim tipe
+ * MIME kosong atau nama berkas yang keliru.
+ */
+export async function berkasHeic(file: File): Promise<boolean> {
+  const tipe = file.type.toLowerCase();
+  if (tipe === 'image/heic' || tipe === 'image/heif' || tipe.startsWith('image/hei')) return true;
+  if (/\.(heic|heif)$/i.test(file.name)) return true;
+
+  try {
+    const kepala = new Uint8Array(await file.slice(0, 12).arrayBuffer());
+    if (kepala.length < 12) return false;
+    const teks = (dari: number, sampai: number) =>
+      String.fromCharCode(...kepala.slice(dari, sampai)).toLowerCase();
+    return teks(4, 8) === 'ftyp' && MEREK_HEIC.includes(teks(8, 12));
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Ubah HEIC/HEIF jadi JPG memakai libheif (paket heic-to). Modul ini ~3 MB,
+ * jadi baru diunduh saat admin benar-benar memilih foto HEIC.
+ */
+async function ubahHeicKeJpeg(file: File): Promise<Blob> {
+  try {
+    const { heicTo } = await import('heic-to');
+    const hasil = await heicTo({ blob: file, type: 'image/jpeg', quality: 0.95 });
+    if (!hasil || hasil.size === 0) throw new Error('hasil konversi kosong');
+    return hasil;
+  } catch {
+    throw new Error(
+      `Foto "${file.name}" berformat HEIC. Pengubah HEIC butuh internet sekali saja (sekitar 0,8 MB) dan gagal diunduh/dijalankan sekarang. ` +
+        'Coba lagi saat sinyal bagus, atau ubah fotonya ke JPG lewat aplikasi Galeri di HP.',
+    );
+  }
 }
 
 export function fileSizeLabel(bytes: number): string {

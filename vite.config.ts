@@ -95,6 +95,10 @@ export default defineConfig({
         // Jangan pra-cache foto besar (jpg/jpeg) agar pemasangan tetap ringan.
         // webmanifest ikut supaya manifest admin tetap ada saat offline.
         globPatterns: ['**/*.{js,css,html,ico,svg,woff,woff2,png,webmanifest}'],
+        // Konverter HEIC (libheif, ~3 MB) TIDAK ikut dipra-cache saat pemasangan
+        // app; ia diunduh hanya kalau admin memilih foto HEIC, lalu disimpan oleh
+        // rute 'konverter-heic' di runtimeCaching bawah.
+        globIgnores: ['**/heic-to-*.js'],
         navigateFallback: '/index.html',
         // Navigasi ke area admin TIDAK boleh dijawab index.html (manifest toko).
         // Alasannya: iOS memakai start_url manifest dari dokumen yang benar-benar
@@ -154,6 +158,21 @@ export default defineConfig({
                 purgeOnQuotaError: true,
               },
               cacheableResponse: { statuses: [200] },
+            },
+          },
+          {
+            // Konverter HEIC (libheif). Sekali diunduh saat admin memilih foto
+            // HEIC, lalu disimpan lama supaya unggahan berikutnya instan.
+            urlPattern: /\/assets\/heic-to-[^/]+\.js$/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'konverter-heic',
+              expiration: {
+                maxEntries: 4,
+                maxAgeSeconds: 60 * 60 * 24 * 365,
+                purgeOnQuotaError: true,
+              },
+              cacheableResponse: { statuses: [0, 200] },
             },
           },
           {
