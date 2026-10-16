@@ -5,6 +5,7 @@ import Footer from './components/Footer';
 import Cart from './components/Cart';
 import MobileNav from './components/MobileNav';
 import PwaInstall from './components/PwaInstall';
+import { useManifestAplikasi } from './hooks/useManifestAplikasi';
 import Home from './pages/Home';
 import About from './pages/About';
 import Products from './pages/Products';
@@ -48,6 +49,10 @@ const Shell: React.FC<ShellProps> = ({
   const isDetailProduk = /^\/produk\/[^/]+/.test(pathname);
   const pakaiMobileNav = !isAdminArea && !isDetailProduk;
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+
+  // Area admin memasang manifest sendiri, jadi keduanya bisa dipasang sebagai
+  // dua aplikasi berbeda (ikon toko dan ikon admin di layar utama).
+  useManifestAplikasi(isAdminArea ? '/admin.webmanifest' : '/manifest.webmanifest');
 
   return (
     <div className="min-h-screen bg-canvas font-sans text-ink">

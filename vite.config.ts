@@ -51,13 +51,24 @@ export default defineConfig({
           },
         ],
         shortcuts: [
-          { name: 'Katalog bibit', short_name: 'Katalog', url: '/produk' },
-          { name: 'Hubungi kami', short_name: 'Kontak', url: '/kontak' },
+          {
+            name: 'Katalog bibit',
+            short_name: 'Katalog',
+            url: '/produk',
+            icons: [{ src: '/icons/pwa-192x192.png', sizes: '192x192' }],
+          },
+          {
+            name: 'Panel admin',
+            short_name: 'Admin',
+            url: '/admin',
+            icons: [{ src: '/icons/admin-192x192.png', sizes: '192x192' }],
+          },
         ],
       },
       workbox: {
         // Jangan pra-cache foto besar (jpg/jpeg) agar pemasangan tetap ringan.
-        globPatterns: ['**/*.{js,css,html,ico,svg,woff,woff2,png}'],
+        // webmanifest ikut supaya manifest admin tetap ada saat offline.
+        globPatterns: ['**/*.{js,css,html,ico,svg,woff,woff2,png,webmanifest}'],
         navigateFallback: '/index.html',
         // Panggilan API jangan pernah dijawab index.html.
         navigateFallbackDenylist: [/^\/api\//],

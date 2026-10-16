@@ -1,0 +1,44 @@
+{
+  "id": "/admin",
+  "name": "Sahid Tani Admin",
+  "short_name": "ST Admin",
+  "description": "Panel admin Sahid Tani: kelola produk, harga, stok, dan kategori bibit.",
+  "lang": "id",
+  "dir": "ltr",
+  "start_url": "/admin",
+  "scope": "/admin",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#08150f",
+  "theme_color": "#156a3e",
+  "categories": ["business", "productivity"],
+  "icons": [
+    {
+      "src": "/icons/admin-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/admin-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Ringkasan",
+      "short_name": "Ringkasan",
+      "url": "/admin",
+      "icons": [{ "src": "/icons/admin-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Kelola produk",
+      "short_name": "Produk",
+      "url": "/admin/produk",
+      "icons": [{ "src": "/icons/admin-192x192.png", "sizes": "192x192" }]
+    }
+  ]
+}
