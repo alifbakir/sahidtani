@@ -9,8 +9,11 @@ name: Jaga Supabase tetap bangun
 
 on:
   schedule:
-    # Setiap hari 04:17 UTC = 11:17 WIB.
-    - cron: '17 4 * * *'
+    # Setiap 6 jam: 01:17, 07:17, 13:17, 19:17 UTC = 08:17, 14:17, 20:17,
+    # 02:17 WIB. Dokumen Supabase menyebut "beberapa permintaan ke database
+    # setiap hari" sudah cukup; tiap run memanggil 3 endpoint, jadi ada ~12
+    # permintaan/hari. Cadangan kalau GitHub menunda/menolak satu run.
+    - cron: '17 1,7,13,19 * * *'
   # Ikut jalan saat berkas ini diubah, supaya perubahannya bisa langsung
   # diuji dari tab Actions tanpa menunggu jadwal.
   push:
