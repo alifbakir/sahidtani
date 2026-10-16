@@ -4,10 +4,14 @@ import { Download, Share, X } from 'lucide-react';
 /**
  * Kartu ajakan memasang Sahid Tani sebagai aplikasi (PWA).
  *
- * Chrome/Edge/Android memunculkan event `beforeinstallprompt`; event itu kita
- * tahan supaya tidak muncul bilah bawaan browser, lalu dipakai lagi saat
- * pengunjung menekan tombol "Pasang".
+ * TIDAK DIPAKAI LAGI: pemilik toko meminta pop-up ini tidak muncul saat orang
+ * membuka website, jadi komponen ini tidak dipasang di App.tsx. Untuk
+ * menghidupkannya kembali: import di App.tsx lalu pasang
+ * `<PwaInstall mode={isAdminArea ? 'admin' : 'toko'} />`.
  *
+ * Cara kerjanya kalau dipakai: Chrome/Edge/Android memunculkan event
+ * `beforeinstallprompt`; event itu ditahan supaya tidak muncul bilah bawaan
+ * browser, lalu dipakai lagi saat pengunjung menekan tombol "Pasang".
  * Safari (iOS) tidak mendukung event tersebut, jadi di sana yang ditampilkan
  * adalah petunjuk manual: Bagikan → Tambah ke Layar Utama.
  */

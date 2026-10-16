@@ -4,7 +4,6 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Cart from './components/Cart';
 import MobileNav from './components/MobileNav';
-import PwaInstall from './components/PwaInstall';
 import { useManifestAplikasi } from './hooks/useManifestAplikasi';
 import Home from './pages/Home';
 import About from './pages/About';
@@ -93,9 +92,9 @@ const Shell: React.FC<ShellProps> = ({
 
       {pakaiMobileNav && <MobileNav cartCount={cartCount} onCartClick={onCartOpen} />}
 
-      {/* Ajakan memasang app (PWA). Dua aplikasi: toko di halaman publik,
-          panel admin di area /admin — masing-masing punya ikon sendiri. */}
-      <PwaInstall mode={isAdminArea ? 'admin' : 'toko'} />
+      {/* Kartu ajakan memasang aplikasi (PwaInstall) sengaja TIDAK dipasang:
+          pengunjung tidak mau diganggu pop-up. Komponennya masih ada di
+          src/components/PwaInstall.tsx kalau nanti mau dipakai lagi. */}
     </div>
   );
 };
