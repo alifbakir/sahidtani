@@ -2,15 +2,11 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
     {
-      "source": "/admin",
+      "source": "/admin(/.*)?",
       "destination": "/admin.html"
     },
     {
-      "source": "/admin/:path*",
-      "destination": "/admin.html"
-    },
-    {
-      "source": "/((?!api/|admin$|admin/|sw\\.js|registerSW\\.js|workbox-.*\\.js|manifest\\.webmanifest|admin\\.webmanifest|icons/).*)",
+      "source": "/((?!api/|sw\\.js|registerSW\\.js|workbox-.*\\.js|manifest\\.webmanifest|admin\\.webmanifest|icons/).*)",
       "destination": "/index.html"
     }
   ],
