@@ -11,6 +11,7 @@ import {
   Save,
   ImagePlus,
   Info,
+  Maximize2,
 } from 'lucide-react';
 import { fetchCategories, fetchProduct, FALLBACK_IMAGE } from '../../lib/api';
 import {
@@ -21,6 +22,7 @@ import {
 } from '../../lib/admin';
 import { slugify, toNumber } from '../../lib/utils';
 import { fotoProduk } from '../../lib/image';
+import ImageLightbox from '../../components/ImageLightbox';
 import type { Category, ProductInput } from '../../types';
 
 const emptyForm: ProductInput = {
@@ -61,6 +63,8 @@ const AdminProductForm: React.FC = () => {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
+  /** Nomor foto yang sedang diperbesar (null = pratinjau tertutup). */
+  const [pratinjau, setPratinjau] = useState<number | null>(null);
 
   const originalImages = useRef<string[]>([]);
   const fileInput = useRef<HTMLInputElement>(null);
@@ -313,11 +317,21 @@ const AdminProductForm: React.FC = () => {
                 key={url}
                 className="group relative overflow-hidden rounded-2xl border border-line bg-surface2"
               >
-                <img
-                  src={fotoProduk(url || FALLBACK_IMAGE, 320)}
-                  alt={`Foto ${index + 1}`}
-                  className="aspect-square w-full object-cover"
-                />
+                <button
+                  type="button"
+                  onClick={() => setPratinjau(index)}
+                  aria-label={`Perbesar foto ${index + 1}`}
+                  className="block w-full cursor-zoom-in"
+                >
+                  <img
+                    src={fotoProduk(url || FALLBACK_IMAGE, 320)}
+                    alt=""
+                    className="aspect-square w-full object-cover"
+                  />
+                </button>
+                <span className="pointer-events-none absolute left-2 top-2 grid h-7 w-7 place-items-center rounded-full bg-deep/55 text-white backdrop-blur-sm">
+                  <Maximize2 className="h-3.5 w-3.5" />
+                </span>
                 <button
                   type="button"
                   onClick={() => void removeImage(url)}
@@ -610,6 +624,17 @@ const AdminProductForm: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* Pratinjau besar: admin bisa memeriksa foto sebelum menyimpan. */}
+      {pratinjau !== null && form.images[pratinjau] && (
+        <ImageLightbox
+          images={form.images}
+          index={pratinjau}
+          onIndexChange={setPratinjau}
+          onClose={() => setPratinjau(null)}
+          title={form.name.trim() || 'Foto produk'}
+        />
+      )}
     </form>
   );
 };

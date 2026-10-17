@@ -125,3 +125,16 @@ export function fotoProduk(url: string, ukuran: number, kualitas = 72): string {
   const pemisah = dasar.includes('?') ? '&' : '?';
   return `${dasar}${pemisah}width=${ukuran}&height=${ukuran}&resize=cover&quality=${kualitas}`;
 }
+
+/**
+ * Foto utuh untuk pratinjau besar: hanya lebar yang diminta, jadi rasio asli
+ * foto dipertahankan (tidak dipotong persegi seperti kartu produk). Dipakai
+ * admin untuk memastikan foto yang diunggah memang benar.
+ */
+export function fotoProdukUtuh(url: string, lebar = 1400, kualitas = 85): string {
+  if (!url.includes(STORAGE_PUBLIC) || url.includes('/render/image/')) return url;
+
+  const dasar = url.replace(STORAGE_PUBLIC, '/storage/v1/render/image/public/');
+  const pemisah = dasar.includes('?') ? '&' : '?';
+  return `${dasar}${pemisah}width=${lebar}&quality=${kualitas}`;
+}

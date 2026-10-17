@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import {
   ChevronLeft,
+  ChevronRight,
   Star,
   ShoppingCart,
   Info,
@@ -33,7 +34,9 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onAddToCart }) => {
   const navigate = useNavigate();
   const [product, setProduct] = useState<Product | null>(null);
   const [lainnya, setLainnya] = useState<Product[]>([]);
-  const [activeImage, setActiveImage] = useState<string>('');
+  const [activeIndex, setActiveIndex] = useState(0);
+  const trackRef = useRef<HTMLDivElement | null>(null);
+  const thumbRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const [activeTab, setActiveTab] = useState<'deskripsi' | 'ciri' | 'tanam' | 'rawat'>('deskripsi');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -66,7 +69,6 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onAddToCart }) => {
           return;
         }
         setProduct(found);
-        setActiveImage(found.images[0]);
         setActiveTab('deskripsi');
       } catch (err) {
         if (active) setError(err instanceof Error ? err.message : 'Gagal memuat produk.');
@@ -103,6 +105,51 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onAddToCart }) => {
       active = false;
     };
   }, [product]);
+
+  // ------------------------------------------------------ GALERI (geser)
+  const jumlahFoto = product?.images.length ?? 0;
+
+  /** Pindah ke slide ke-idx — dipakai tombol panah dan thumbnail. */
+  const keSlide = (idx: number) => {
+    const tujuan = Math.min(Math.max(idx, 0), Math.max(0, jumlahFoto - 1));
+    setActiveIndex(tujuan);
+    trackRef.current?.scrollTo({ left: (trackRef.current.clientWidth || 0) * tujuan, behavior: 'smooth' });
+  };
+
+  /** Geser manual (swipe di HP): selaraskan nomor foto yang aktif. */
+  const saatGeser = () => {
+    const track = trackRef.current;
+    if (!track || track.clientWidth === 0) return;
+    const idx = Math.round(track.scrollLeft / track.clientWidth);
+    setActiveIndex(Math.min(Math.max(idx, 0), Math.max(0, jumlahFoto - 1)));
+  };
+
+  // Produk berganti → kembali ke foto pertama.
+  useEffect(() => {
+    setActiveIndex(0);
+    trackRef.current?.scrollTo({ left: 0 });
+  }, [product?.id]);
+
+  // Layar diputar / diubah ukurannya → slide tidak boleh berhenti di tengah.
+  useEffect(() => {
+    const atur = () => {
+      const track = trackRef.current;
+      if (track) track.scrollTo({ left: track.clientWidth * activeIndex });
+    };
+    window.addEventListener('resize', atur);
+    return () => window.removeEventListener('resize', atur);
+  }, [activeIndex]);
+
+  // Thumbnail aktif digeser ke tengah barisnya sendiri (tanpa menggeser halaman).
+  useEffect(() => {
+    const thumb = thumbRefs.current[activeIndex];
+    const row = thumb?.parentElement;
+    if (!thumb || !row || row.scrollWidth <= row.clientWidth) return;
+    const kotakBaris = row.getBoundingClientRect();
+    const kotakThumb = thumb.getBoundingClientRect();
+    const tujuan = row.scrollLeft + (kotakThumb.left - kotakBaris.left) - (kotakBaris.width - kotakThumb.width) / 2;
+    row.scrollTo({ left: Math.max(0, tujuan), behavior: 'smooth' });
+  }, [activeIndex]);
 
   if (loading) {
     return (
@@ -171,18 +218,34 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onAddToCart }) => {
         <div className="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-14">
           {/* --------------------------------------------------- GALERI */}
           <div className="lg:sticky lg:top-28 lg:self-start">
-            <motion.div
-              key={activeImage}
-              initial={{ opacity: 0.6, scale: 0.99 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="relative aspect-square overflow-hidden rounded-[1.5rem] border border-line bg-surface2 md:rounded-[2rem]"
-            >
-              <img
-                src={fotoProduk(activeImage, 900)}
-                alt={product.name}
-                className="h-full w-full object-cover"
-                referrerPolicy="no-referrer"
-              />
+            <div className="relative overflow-hidden rounded-[1.5rem] border border-line bg-surface2 md:rounded-[2rem]">
+              {/* Satu foto per layar: di HP cukup diusap ke kiri/kanan. */}
+              <div
+                ref={trackRef}
+                onScroll={saatGeser}
+                role="group"
+                aria-roledescription="carousel"
+                aria-label={`Foto ${product.name}`}
+                className="no-scrollbar flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain"
+              >
+                {product.images.map((img, idx) => (
+                  <div
+                    key={img + idx}
+                    aria-hidden={idx !== activeIndex}
+                    className="relative aspect-square w-full flex-shrink-0 snap-center snap-always"
+                  >
+                    <img
+                      src={fotoProduk(img, 900)}
+                      alt={`${product.name} foto ${idx + 1}`}
+                      className="h-full w-full object-cover"
+                      referrerPolicy="no-referrer"
+                      draggable={false}
+                      loading={idx === 0 ? 'eager' : 'lazy'}
+                    />
+                  </div>
+                ))}
+              </div>
+
               {diskon > 0 && (
                 <span className="badge absolute left-4 top-4 bg-promo text-white shadow-sm">
                   Diskon {diskon}%
@@ -193,17 +256,48 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onAddToCart }) => {
                   Stok habis
                 </span>
               )}
-            </motion.div>
 
-            {product.images.length > 1 && (
+              {jumlahFoto > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => keSlide(activeIndex - 1)}
+                    disabled={activeIndex === 0}
+                    aria-label="Foto sebelumnya"
+                    className="absolute left-3 top-1/2 hidden h-10 w-10 -translate-y-1/2 place-items-center rounded-full border border-line bg-surface/90 text-ink shadow-sm backdrop-blur transition hover:bg-surface disabled:pointer-events-none disabled:opacity-0 md:grid"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => keSlide(activeIndex + 1)}
+                    disabled={activeIndex === jumlahFoto - 1}
+                    aria-label="Foto berikutnya"
+                    className="absolute right-3 top-1/2 hidden h-10 w-10 -translate-y-1/2 place-items-center rounded-full border border-line bg-surface/90 text-ink shadow-sm backdrop-blur transition hover:bg-surface disabled:pointer-events-none disabled:opacity-0 md:grid"
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </button>
+                  <span className="badge pointer-events-none absolute bottom-3 right-3 bg-ink/70 text-canvas md:hidden">
+                    {activeIndex + 1}/{jumlahFoto}
+                  </span>
+                </>
+              )}
+            </div>
+
+            {jumlahFoto > 1 && (
               <div className="no-scrollbar mt-3 flex gap-3 overflow-x-auto pb-1">
                 {product.images.map((img, idx) => (
                   <button
                     key={img + idx}
-                    onClick={() => setActiveImage(img)}
-                    aria-label={`Foto ${idx + 1} dari ${product.name}`}
+                    type="button"
+                    ref={(el) => {
+                      thumbRefs.current[idx] = el;
+                    }}
+                    onClick={() => keSlide(idx)}
+                    aria-label={`Foto ${idx + 1} dari ${jumlahFoto}`}
+                    aria-current={activeIndex === idx}
                     className={`h-18 w-18 flex-shrink-0 overflow-hidden rounded-2xl border-2 transition-all ${
-                      activeImage === img
+                      activeIndex === idx
                         ? 'border-brand opacity-100'
                         : 'border-transparent opacity-60 hover:opacity-100'
                     }`}
