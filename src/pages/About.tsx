@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { Heart, Award, Sprout, Quote, Leaf, Users, BadgeCheck } from 'lucide-react';
 import Reveal from '../components/Reveal';
+import { useMeta } from '../hooks/useMeta';
 
 const statistik = [
   { value: '2006', label: 'Berdiri sejak' },
@@ -37,8 +38,15 @@ const cerita = [
 
 const glow = 'text-[#7ef0ab]';
 
-const About = () => (
-  <div>
+const About = () => {
+  useMeta({
+    judul: 'Tentang Sahid Tani — Pembibit Buah di Salatiga',
+    deskripsi:
+      'Sahid Tani membudidayakan bibit buah unggul di Salatiga dengan okulasi dan perawatan yang rapi, siap ditanam di pekarangan maupun kebun.',
+  });
+
+  return (
+    <div>
     {/* ---------------------------------------------------------- HERO */}
     <section className="relative isolate flex min-h-[62svh] items-center overflow-hidden md:min-h-[70svh]">
       <img
@@ -210,7 +218,8 @@ const About = () => (
         ))}
       </div>
     </section>
-  </div>
-);
+    </div>
+  );
+};
 
 export default About;

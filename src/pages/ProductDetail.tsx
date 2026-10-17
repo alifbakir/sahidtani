@@ -21,6 +21,7 @@ import {
 import { fetchProduct, fetchProducts } from '../lib/api';
 import { hargaJual, diskonPersen } from '../lib/utils';
 import { fotoProduk } from '../lib/image';
+import { useMeta, fotoBagikan } from '../hooks/useMeta';
 import { Product } from '../types';
 import ProductCard from '../components/ProductCard';
 import Reveal from '../components/Reveal';
@@ -149,6 +150,20 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onAddToCart }) => {
     const tujuan = row.scrollLeft + (kotakThumb.left - kotakBaris.left) - (kotakBaris.width - kotakThumb.width) / 2;
     row.scrollTo({ left: Math.max(0, tujuan), behavior: 'smooth' });
   }, [activeIndex]);
+
+  // Judul & deskripsi tab/berbagi mengikuti produk yang sedang dibuka.
+  useMeta({
+    judul: product
+      ? `${product.name} — Rp ${hargaJual(product).toLocaleString('id-ID')} | Sahid Tani Salatiga`
+      : 'Bibit Buah Unggul — Sahid Tani Salatiga',
+    deskripsi: product
+      ? `${product.name} dari Sahid Tani Salatiga. Harga Rp ${hargaJual(product).toLocaleString('id-ID')}. ${
+          product.stock > 0 && product.isAvailable ? `Stok tersedia ${product.stock}.` : 'Stok sedang kosong.'
+        } ${product.description}`.slice(0, 158)
+      : undefined,
+    gambar: fotoBagikan(product?.images[0]),
+    kanonis: product ? `https://www.sahidtani.web.id/produk/${product.id}` : undefined,
+  });
 
   if (loading) {
     return (

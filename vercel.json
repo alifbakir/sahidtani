@@ -6,7 +6,7 @@
       "destination": "/admin.html"
     },
     {
-      "source": "/((?!api/|sw\\.js|registerSW\\.js|workbox-.*\\.js|manifest\\.webmanifest|admin\\.webmanifest|icons/).*)",
+      "source": "/((?!api/|sw\\.js|registerSW\\.js|workbox-.*\\.js|manifest\\.webmanifest|admin\\.webmanifest|icons/|robots\\.txt|sitemap\\.xml).*)",
       "destination": "/index.html"
     }
   ],

@@ -19,6 +19,7 @@ import {
 import { fetchProducts } from '../lib/api';
 import ProductCard from '../components/ProductCard';
 import Reveal from '../components/Reveal';
+import { useMeta } from '../hooks/useMeta';
 import { Product } from '../types';
 
 interface HomeProps {
@@ -75,6 +76,12 @@ const langkah = [
 const Home: React.FC<HomeProps> = ({ onAddToCart }) => {
   const [featuredProducts, setFeaturedProducts] = React.useState<Product[]>([]);
   const [loading, setLoading] = React.useState(true);
+
+  useMeta({
+    judul: 'Sahid Tani — Pusat Bibit Buah Unggul di Salatiga',
+    deskripsi:
+      'Bibit buah unggul dari Salatiga: durian, alpukat, mangga, jeruk, dan lainnya. Harga jelas, stok terbaru, siap kirim ke seluruh Indonesia.',
+  });
 
   React.useEffect(() => {
     let active = true;

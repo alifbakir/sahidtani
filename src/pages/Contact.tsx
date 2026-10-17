@@ -13,6 +13,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import Reveal from '../components/Reveal';
+import { useMeta } from '../hooks/useMeta';
 
 const kontak = [
   {
@@ -31,6 +32,12 @@ const WA_LINK = 'https://wa.me/6285878412411?text=Halo%20Sahid%20Tani%2C%20saya%
 const Contact = () => {
   const [name, setName] = useState('');
   const [message, setMessage] = useState('');
+
+  useMeta({
+    judul: 'Kontak & Lokasi Sahid Tani — Salatiga',
+    deskripsi:
+      'Hubungi Sahid Tani lewat WhatsApp untuk tanya stok, harga, dan pengiriman bibit buah dari Salatiga.',
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

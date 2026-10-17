@@ -3,6 +3,7 @@ import { Search, AlertCircle, Sprout, X, SlidersHorizontal } from 'lucide-react'
 import { fetchCategories, fetchProducts } from '../lib/api';
 import ProductCard from '../components/ProductCard';
 import Reveal from '../components/Reveal';
+import { useMeta } from '../hooks/useMeta';
 import { Product, Category } from '../types';
 import { hargaJual } from '../lib/utils';
 import { useFlipGrid } from '../lib/useFlipGrid';
@@ -28,6 +29,12 @@ const Products: React.FC<ProductsProps> = ({ onAddToCart }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Semua');
   const [urutan, setUrutan] = useState<Urutan>('unggulan');
+
+  useMeta({
+    judul: 'Katalog Bibit Buah — Sahid Tani Salatiga',
+    deskripsi:
+      'Daftar lengkap bibit buah Sahid Tani: durian bawor, alpukat aligator, mangga, jeruk, dan lainnya. Lihat harga dan stok terbaru.',
+  });
 
   useEffect(() => {
     let active = true;
