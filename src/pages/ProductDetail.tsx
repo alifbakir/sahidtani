@@ -77,7 +77,6 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onAddToCart }) => {
       }
     })();
 
-    window.scrollTo(0, 0);
     return () => {
       active = false;
     };
@@ -175,7 +174,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onAddToCart }) => {
           </span>
           <h1 className="mt-5 text-xl font-extrabold text-ink">Produk tidak bisa ditampilkan</h1>
           <p className="mt-2 text-sm text-inksoft">{error || 'Produk tidak ditemukan.'}</p>
-          <Link to="/produk" className="btn btn-primary mt-6">
+          <Link to="/produk" state={{ pulihkanGulir: true }} className="btn btn-primary mt-6">
             <ChevronLeft className="h-4 w-4" /> Kembali ke katalog
           </Link>
         </div>
@@ -208,6 +207,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onAddToCart }) => {
       <div className="shell pt-28 md:pt-36">
         <Link
           to="/produk"
+          state={{ pulihkanGulir: true }}
           className="inline-flex min-h-10 items-center gap-2 text-sm font-bold text-inksoft transition-colors hover:text-brand"
         >
           <ChevronLeft className="h-4 w-4" /> Kembali ke katalog

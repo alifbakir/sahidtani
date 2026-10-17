@@ -163,6 +163,15 @@
     scroll-behavior: smooth;
     -webkit-tap-highlight-color: transparent;
     scroll-padding-top: 6rem;
+    /*
+     * Scroll anchoring dimatikan: saat katalog yang baru dibuka memuat produk
+     * dari server, browser sempat "mengikat" posisi gulir ke elemen di dekat
+     * layar lalu menggeser seluruh halaman ketika isinya bertambah. Akibatnya
+     * pembeli yang menekan tombol kembali mendarat di dasar katalog, bukan di
+     * posisi semula. Semua gambar sudah punya kotak ukuran tetap, jadi
+     * anchoring tidak diperlukan di sini.
+     */
+    overflow-anchor: none;
   }
 
   body {

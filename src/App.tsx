@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Cart from './components/Cart';
 import MobileNav from './components/MobileNav';
+import ScrollToTop from './components/ScrollToTop';
 import { useManifestAplikasi } from './hooks/useManifestAplikasi';
 import Home from './pages/Home';
 import About from './pages/About';
@@ -99,15 +100,7 @@ const Shell: React.FC<ShellProps> = ({
   );
 };
 
-// Scroll to top on route change
-const ScrollToTop = () => {
-  const { pathname } = useLocation();
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
-  return null;
-};
-
+// Posisi gulir diatur oleh komponen ScrollToTop (src/components/ScrollToTop.tsx).
 const App: React.FC = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
