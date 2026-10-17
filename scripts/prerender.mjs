@@ -69,6 +69,36 @@ function aman(teks) {
     .replace(/"/g, '&quot;');
 }
 
+/** Data toko untuk Google (LocalBusiness). Dipakai di halaman depan supaya
+ *  pencarian "jual bibit buah unggul salatiga" mengenali ini toko di Salatiga. */
+const DATA_TOKO = {
+  '@context': 'https://schema.org',
+  '@type': 'Store',
+  name: 'Sahid Tani',
+  alternateName: 'Sahid Tani — Pusat Bibit Buah Salatiga',
+  description:
+    'Toko bibit buah unggul di Salatiga: durian bawor, alpukat aligator, mangga, jeruk, dan puluhan varietas lain. Bibit hasil okulasi, siap kirim ke seluruh Indonesia.',
+  url: SITUS,
+  image: `${SITUS}/LOGONOBG.png`,
+  logo: `${SITUS}/LOGONOBG.png`,
+  telephone: '+6285878412411',
+  priceRange: 'Rp',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Jl. Plongkowati No.7, Tegalrejo, Kec. Argomulyo',
+    addressLocality: 'Kota Salatiga',
+    addressRegion: 'Jawa Tengah',
+    postalCode: '50733',
+    addressCountry: 'ID',
+  },
+  geo: { '@type': 'GeoCoordinates', latitude: -7.3424819, longitude: 110.5045028 },
+  areaServed: { '@type': 'City', name: 'Salatiga' },
+  sameAs: [
+    'https://www.instagram.com/sahid.tani_/',
+    'https://www.facebook.com/sahid.tani.12',
+  ],
+};
+
 async function ambilProduk() {
   const env = bacaEnv();
   const url = env.VITE_SUPABASE_URL;
@@ -213,9 +243,10 @@ async function main() {
   // ---- Halaman tetap (judul & deskripsi bawaan) -----------------------
   const tetap = {
     '/': {
-      judul: 'Sahid Tani — Pusat Bibit Buah Unggul di Salatiga',
+      judul: 'Jual Bibit Buah Unggul Salatiga — Sahid Tani',
       deskripsi:
-        'Bibit buah unggul dari Salatiga: durian, alpukat, mangga, jeruk, dan lainnya. Harga jelas, stok terbaru, siap kirim ke seluruh Indonesia.',
+        'Sahid Tani menjual bibit buah unggul di Salatiga: durian bawor, alpukat aligator, mangga, jeruk, dan puluhan varietas lain. Harga jelas, stok terbaru, siap kirim.',
+      dataTerstruktur: DATA_TOKO,
     },
     '/produk': {
       judul: 'Katalog Bibit Buah — Sahid Tani Salatiga',
@@ -239,6 +270,7 @@ async function main() {
       deskripsi: meta.deskripsi,
       gambar: `${SITUS}/LOGONOBG.png`,
       kanonis: `${SITUS}${jalur}`,
+      dataTerstruktur: meta.dataTerstruktur,
     });
 
     if (jalur === '/') {

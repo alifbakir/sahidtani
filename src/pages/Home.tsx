@@ -78,9 +78,9 @@ const Home: React.FC<HomeProps> = ({ onAddToCart }) => {
   const [loading, setLoading] = React.useState(true);
 
   useMeta({
-    judul: 'Sahid Tani — Pusat Bibit Buah Unggul di Salatiga',
+    judul: 'Jual Bibit Buah Unggul Salatiga — Sahid Tani',
     deskripsi:
-      'Bibit buah unggul dari Salatiga: durian, alpukat, mangga, jeruk, dan lainnya. Harga jelas, stok terbaru, siap kirim ke seluruh Indonesia.',
+      'Sahid Tani menjual bibit buah unggul di Salatiga: durian bawor, alpukat aligator, mangga, jeruk, dan puluhan varietas lain. Harga jelas, stok terbaru, siap kirim.',
   });
 
   React.useEffect(() => {
@@ -128,7 +128,7 @@ const Home: React.FC<HomeProps> = ({ onAddToCart }) => {
             className="max-w-3xl"
           >
             <span className="badge border border-white/20 bg-white/10 text-white backdrop-blur-sm">
-              <Sprout className="h-3.5 w-3.5" /> Pusat Bibit Buah · Salatiga
+              <Sprout className="h-3.5 w-3.5" /> Jual Bibit Buah Unggul · Salatiga
             </span>
 
             <h1 className="display mt-5 text-[2rem] leading-[1.05] text-white sm:text-5xl lg:text-[3.75rem]">
@@ -138,8 +138,9 @@ const Home: React.FC<HomeProps> = ({ onAddToCart }) => {
             </h1>
 
             <p className="mt-5 max-w-xl text-sm leading-relaxed text-white/80 md:text-lg">
-              Lebih dari dua dekade menyediakan bibit durian, alpukat, mangga, dan puluhan
-              varietas lain — sehat, berakar kuat, dan dikirim aman ke seluruh Indonesia.
+              Lebih dari dua dekade menjual bibit buah unggul di Salatiga — durian, alpukat,
+              mangga, dan puluhan varietas lain. Sehat, berakar kuat, dan dikirim aman ke
+              seluruh Indonesia.
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
