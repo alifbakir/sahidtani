@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Search, AlertCircle, Sprout, X, SlidersHorizontal } from 'lucide-react';
 import { fetchCategories, fetchProducts } from '../lib/api';
 import ProductCard from '../components/ProductCard';
@@ -6,6 +6,7 @@ import Reveal from '../components/Reveal';
 import { useMeta } from '../hooks/useMeta';
 import { Product, Category } from '../types';
 import { hargaJual } from '../lib/utils';
+import { gulirKe } from '../lib/gulir';
 import { useFlipGrid } from '../lib/useFlipGrid';
 
 interface ProductsProps {
@@ -90,6 +91,32 @@ const Products: React.FC<ProductsProps> = ({ onAddToCart }) => {
   // Saat urutan berubah, kartu meluncur ke posisi barunya (lihat useFlipGrid).
   const gridRef = useFlipGrid<HTMLDivElement>([filteredProducts]);
 
+  /**
+   * Ganti kategori/pencarian/urutan membuat daftar hasil jadi lebih pendek.
+   * Kalau pembeli sedang menggulir jauh ke bawah, posisi gulirnya tertinggal di
+   * dasar halaman (yang terlihat footer, bukan hasil filter). Karena itu gulir
+   * dikembalikan ke baris pertama hasil, tepat di bawah bar filter yang lengket.
+   */
+  const barFilterRef = useRef<HTMLDivElement>(null);
+  const hasilRef = useRef<HTMLElement>(null);
+  const renderPertama = useRef(true);
+
+  useEffect(() => {
+    if (renderPertama.current) {
+      renderPertama.current = false;
+      return;
+    }
+
+    const bar = barFilterRef.current;
+    const hasil = hasilRef.current;
+    if (!bar || !hasil) return;
+
+    // 64px = tinggi navbar (top-16) tempat bar filter menempel.
+    const batasAtas =
+      hasil.getBoundingClientRect().top + window.scrollY - bar.offsetHeight - 64 - 8;
+    if (window.scrollY > batasAtas) gulirKe(batasAtas);
+  }, [selectedCategory, searchQuery, urutan]);
+
   const adaFilter = searchQuery.trim() !== '' || selectedCategory !== 'Semua' || urutan !== 'unggulan';
 
   const resetFilter = () => {
@@ -123,7 +150,7 @@ const Products: React.FC<ProductsProps> = ({ onAddToCart }) => {
       </section>
 
       {/* -------------------------------------------- FILTER (LENGKET) */}
-      <div className="sticky top-16 z-30 border-b border-line bg-canvas/90 backdrop-blur-xl">
+      <div ref={barFilterRef} className="sticky top-16 z-30 border-b border-line bg-canvas/90 backdrop-blur-xl">
         <div className="shell space-y-3 py-3">
           <div className="flex flex-col gap-3 sm:flex-row">
             <div className="relative flex-1">
@@ -190,7 +217,7 @@ const Products: React.FC<ProductsProps> = ({ onAddToCart }) => {
       </div>
 
       {/* --------------------------------------------------------- GRID */}
-      <section className="shell py-8 md:py-12">
+      <section ref={hasilRef} className="shell py-8 md:py-12">
         {loading ? (
           <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-5 lg:grid-cols-4">
             {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
