@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   ShoppingCart,
@@ -60,6 +60,26 @@ const Navbar: React.FC<NavbarProps> = ({ cartCount, onCartClick }) => {
 
   const animasiHeader = tanpaAnimasi ? 'transition-none' : 'transition-all duration-300';
 
+  /**
+   * Simpan tinggi navbar sebenarnya ke variabel CSS --nav-tinggi. Baris
+   * kategori di katalog memakainya sebagai jarak lengket, supaya tidak
+   * menempel/menyalip navbar (dulu `top-16` = 64px padahal navbar 65px,
+   * jadi teks kategori terlihat mepet ke navbar di HP).
+   */
+  const headerRef = useRef<HTMLElement>(null);
+  useLayoutEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+
+    const simpan = () =>
+      document.documentElement.style.setProperty('--nav-tinggi', `${el.offsetHeight}px`);
+
+    simpan();
+    const pengamat = new ResizeObserver(simpan);
+    pengamat.observe(el);
+    return () => pengamat.disconnect();
+  }, []);
+
   // Header mengecil saat digulir supaya layar HP tidak termakan.
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -85,7 +105,7 @@ const Navbar: React.FC<NavbarProps> = ({ cartCount, onCartClick }) => {
     path === '/' ? pathname === '/' : pathname.startsWith(path);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50">
+    <header ref={headerRef} className="fixed inset-x-0 top-0 z-50">
       {/* Pita informasi: ikut hilang begitu halaman digulir. */}
       <div
         className={`overflow-hidden bg-deep text-ondeep ${animasiHeader} ${

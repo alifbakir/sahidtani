@@ -111,9 +111,14 @@ const Products: React.FC<ProductsProps> = ({ onAddToCart }) => {
     const hasil = hasilRef.current;
     if (!bar || !hasil) return;
 
-    // 64px = tinggi navbar (top-16) tempat bar filter menempel.
+    // Tinggi navbar sebenarnya (diisi Navbar.tsx) supaya hasil filter tidak
+    // tersembunyi di balik navbar.
+    const navTinggi =
+      parseFloat(
+        getComputedStyle(document.documentElement).getPropertyValue('--nav-tinggi'),
+      ) || 64;
     const batasAtas =
-      hasil.getBoundingClientRect().top + window.scrollY - bar.offsetHeight - 64 - 8;
+      hasil.getBoundingClientRect().top + window.scrollY - bar.offsetHeight - navTinggi - 8;
     if (window.scrollY > batasAtas) gulirKe(batasAtas);
   }, [selectedCategory, searchQuery, urutan]);
 
@@ -202,9 +207,10 @@ const Products: React.FC<ProductsProps> = ({ onAddToCart }) => {
       {/* Baris kategori: satu-satunya bagian filter yang lengket (≈52px di HP). */}
       <div
         ref={barFilterRef}
-        className="sticky top-16 z-30 border-b border-line bg-canvas/95 backdrop-blur-xl"
+        style={{ top: 'var(--nav-tinggi)' }}
+        className="sticky z-30 border-b border-line bg-canvas/95 backdrop-blur-xl"
       >
-        <div className="shell py-2.5">
+        <div className="shell pb-2.5 pt-3">
           {/* HP: digeser ke samping. Desktop: dibungkus ke baris berikutnya supaya
               semua kategori kelihatan tanpa perlu digeser. */}
           <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">

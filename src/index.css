@@ -10,6 +10,9 @@
    ============================================================ */
 
 :root {
+  /* Tinggi navbar sebenarnya (diisi Navbar.tsx lewat ResizeObserver).
+     Dipakai elemen lengket supaya tidak menempel/menyalip navbar. */
+  --nav-tinggi: 4rem;
   /* --- permukaan --- */
   --canvas: #f6f3ea;        /* kertas hangat, latar halaman */
   --surface: #ffffff;       /* kartu / panel */
