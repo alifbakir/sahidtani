@@ -59,7 +59,7 @@ const Contact = () => {
         />
         <div className="veil absolute inset-0 -z-10" />
 
-        <div className="shell py-24 text-center md:py-32">
+        <div className="shell pb-24 pt-[calc(var(--nav-tinggi)+1.25rem)] text-center md:py-32">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             <span className="badge border border-white/20 bg-white/10 text-white backdrop-blur-sm">
               <MessageCircle className="h-3.5 w-3.5" /> Kami siap membantu
