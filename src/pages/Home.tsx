@@ -91,9 +91,10 @@ const Home: React.FC<HomeProps> = ({ onAddToCart }) => {
         const all = await fetchProducts();
         if (!active) return;
         const available = all.filter((p) => p.isAvailable);
-        const featured = available.filter((p) => p.isFeatured);
-        // Kalau admin belum menandai produk unggulan, ambil 4 produk pertama.
-        setFeaturedProducts((featured.length > 0 ? featured : available).slice(0, 4));
+        // Beranda hanya menampilkan produk yang dicentang admin
+        // ("Tampilkan di beranda"). Kalau belum ada yang dicentang, bagian
+        // Produk Unggulan disembunyikan — bukan diisi produk acak.
+        setFeaturedProducts(available.filter((p) => p.isFeatured).slice(0, 4));
       } catch {
         if (active) setFeaturedProducts([]);
       } finally {
@@ -218,6 +219,8 @@ const Home: React.FC<HomeProps> = ({ onAddToCart }) => {
       </section>
 
       {/* ------------------------------------------------ PRODUK UNGGULAN */}
+      {/* Hanya tampil kalau admin mencentang produk di "Tampilkan di beranda". */}
+      {(loading || featuredProducts.length > 0) && (
       <section className="section border-y border-line bg-surface">
         <div className="shell">
           <Reveal className="mb-8 flex flex-wrap items-end justify-between gap-4 md:mb-12">
@@ -246,20 +249,6 @@ const Home: React.FC<HomeProps> = ({ onAddToCart }) => {
                 </div>
               ))}
             </div>
-          ) : featuredProducts.length === 0 ? (
-            <div className="card p-8 text-center md:p-12">
-              <p className="text-sm text-inksoft">
-                Katalog bibit sedang diperbarui. Silakan hubungi kami lewat WhatsApp.
-              </p>
-              <a
-                href={WA_TANYA}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-primary mt-5"
-              >
-                <Phone className="h-4 w-4" /> Tanya ketersediaan
-              </a>
-            </div>
           ) : (
             <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-5">
               {featuredProducts.map((product, index) => (
@@ -274,6 +263,7 @@ const Home: React.FC<HomeProps> = ({ onAddToCart }) => {
           )}
         </div>
       </section>
+      )}
 
       {/* -------------------------------------------------- CARA PESAN */}
       <section className="section shell">

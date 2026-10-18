@@ -167,7 +167,9 @@ const Products: React.FC<ProductsProps> = ({ onAddToCart }) => {
             </div>
           </div>
 
-          <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
+          {/* HP: digeser ke samping. Desktop: dibungkus ke baris berikutnya supaya
+              semua kategori kelihatan tanpa perlu digeser. */}
+          <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
             {categoryNames.map((category) => (
               <button
                 key={category}

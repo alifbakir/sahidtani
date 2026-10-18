@@ -18,11 +18,9 @@ const AdminCategories: React.FC = () => {
   const [busy, setBusy] = useState(false);
 
   const [newName, setNewName] = useState('');
-  const [newOrder, setNewOrder] = useState('0');
 
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editName, setEditName] = useState('');
-  const [editOrder, setEditOrder] = useState('0');
 
   const load = async () => {
     setLoading(true);
@@ -53,9 +51,8 @@ const AdminCategories: React.FC = () => {
     setError('');
     setNotice('');
     try {
-      await createCategory(newName, Number(newOrder) || 0);
+      await createCategory(newName);
       setNewName('');
-      setNewOrder('0');
       setNotice('Kategori berhasil ditambahkan.');
       await load();
     } catch (err) {
@@ -68,7 +65,6 @@ const AdminCategories: React.FC = () => {
   const startEdit = (category: Category) => {
     setEditingId(category.id);
     setEditName(category.name);
-    setEditOrder(String(category.sortOrder));
   };
 
   const handleUpdate = async (id: number) => {
@@ -78,7 +74,7 @@ const AdminCategories: React.FC = () => {
     setError('');
     setNotice('');
     try {
-      await updateCategory(id, editName, Number(editOrder) || 0);
+      await updateCategory(id, editName);
       setEditingId(null);
       setNotice('Kategori berhasil diperbarui.');
       await load();
@@ -118,7 +114,8 @@ const AdminCategories: React.FC = () => {
       <div>
         <h1 className="display text-2xl text-ink md:text-3xl">Kategori</h1>
         <p className="mt-1 text-sm text-inksoft">
-          Kategori yang tampil sebagai tombol filter di halaman produk.
+          Kategori yang tampil sebagai tombol filter di halaman produk. Urutannya otomatis A–Z,
+          tidak perlu diatur.
         </p>
       </div>
 
@@ -151,19 +148,6 @@ const AdminCategories: React.FC = () => {
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               placeholder="Misalnya Rambutan"
-              className="field"
-            />
-          </div>
-          <div className="sm:w-32">
-            <label htmlFor="urutan-baru" className="field-label">
-              Urutan
-            </label>
-            <input
-              id="urutan-baru"
-              type="text"
-              inputMode="numeric"
-              value={newOrder}
-              onChange={(e) => setNewOrder(e.target.value)}
               className="field"
             />
           </div>
@@ -209,16 +193,6 @@ const AdminCategories: React.FC = () => {
                       className="field"
                     />
                   </div>
-                  <div className="w-24">
-                    <label className="field-label">Urutan</label>
-                    <input
-                      type="text"
-                      inputMode="numeric"
-                      value={editOrder}
-                      onChange={(e) => setEditOrder(e.target.value)}
-                      className="field"
-                    />
-                  </div>
                   <div className="flex items-center gap-1 md:self-end md:pb-1">
                     <button
                       onClick={() => void handleUpdate(category.id)}
@@ -247,8 +221,7 @@ const AdminCategories: React.FC = () => {
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-sm font-bold text-ink">{category.name}</div>
                     <div className="mt-0.5 text-xs text-inksoft">
-                      /{category.slug} · {counts[category.id] ?? 0} produk · urutan{' '}
-                      {category.sortOrder}
+                      /{category.slug} · {counts[category.id] ?? 0} produk
                     </div>
                   </div>
                   <div className="flex flex-shrink-0 items-center gap-1">

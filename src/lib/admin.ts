@@ -22,7 +22,6 @@ function toRow(input: ProductInput) {
     stock: input.stock,
     is_available: input.isAvailable,
     is_featured: input.isFeatured,
-    sort_order: input.sortOrder,
     description: input.description,
     fruit_features: input.fruitFeatures,
     plant_features: input.plantFeatures,
@@ -158,6 +157,13 @@ export async function toggleProductAvailability(id: number, next: boolean): Prom
   if (error) throw new Error(`Gagal mengubah status: ${error.message}`);
 }
 
+/** Tandai/lepas unggulan langsung dari daftar produk. */
+export async function toggleProductFeatured(id: number, next: boolean): Promise<void> {
+  requireClient();
+  const { error } = await supabase.from('products').update({ is_featured: next }).eq('id', id);
+  if (error) throw new Error(`Gagal mengubah unggulan: ${error.message}`);
+}
+
 /** Ubah stok saja, tanpa membuka form produk. */
 export async function updateProductStock(id: number, stock: number): Promise<void> {
   requireClient();
@@ -167,23 +173,19 @@ export async function updateProductStock(id: number, stock: number): Promise<voi
 
 // ---------------------------------------------------------------- kategori
 
-export async function createCategory(name: string, sortOrder: number): Promise<void> {
+export async function createCategory(name: string): Promise<void> {
   requireClient();
   const { error } = await supabase
     .from('categories')
-    .insert({ name: name.trim(), slug: slugify(name), sort_order: sortOrder });
+    .insert({ name: name.trim(), slug: slugify(name) });
   if (error) throw new Error(`Gagal menambah kategori: ${error.message}`);
 }
 
-export async function updateCategory(
-  id: number,
-  name: string,
-  sortOrder: number,
-): Promise<void> {
+export async function updateCategory(id: number, name: string): Promise<void> {
   requireClient();
   const { error } = await supabase
     .from('categories')
-    .update({ name: name.trim(), slug: slugify(name), sort_order: sortOrder })
+    .update({ name: name.trim(), slug: slugify(name) })
     .eq('id', id);
   if (error) throw new Error(`Gagal memperbarui kategori: ${error.message}`);
 }

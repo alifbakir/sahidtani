@@ -16,7 +16,7 @@ import {
   PackageSearch,
 } from 'lucide-react';
 import { fetchProducts, FALLBACK_IMAGE } from '../../lib/api';
-import { deleteProduct, toggleProductAvailability, updateProductStock } from '../../lib/admin';
+import { deleteProduct, toggleProductAvailability, toggleProductFeatured, updateProductStock } from '../../lib/admin';
 import { formatRupiah, toNumber, adaDiskon, hargaJual, diskonPersen } from '../../lib/utils';
 import { fotoProduk } from '../../lib/image';
 import type { Product } from '../../types';
@@ -124,6 +124,27 @@ const AdminProducts: React.FC = () => {
     }
   };
 
+  const handleToggleFeatured = async (product: Product) => {
+    setBusyId(product.id);
+    setError('');
+    try {
+      const next = !product.isFeatured;
+      await toggleProductFeatured(product.id, next);
+      setProducts((prev) =>
+        prev.map((p) => (p.id === product.id ? { ...p, isFeatured: next } : p)),
+      );
+      setNotice(
+        next
+          ? `"${product.name}" ditandai unggulan dan naik ke urutan atas.`
+          : `"${product.name}" tidak lagi unggulan.`,
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Gagal mengubah unggulan.');
+    } finally {
+      setBusyId(null);
+    }
+  };
+
   const handleToggle = async (product: Product) => {
     setBusyId(product.id);
     setError('');
@@ -153,6 +174,12 @@ const AdminProducts: React.FC = () => {
           <h1 className="display text-2xl text-ink md:text-3xl">Produk</h1>
           <p className="mt-1 text-sm text-inksoft">
             {loading ? 'Memuat katalog…' : `${products.length} produk di katalog.`}
+          </p>
+          <p className="mt-1 flex items-start gap-1.5 text-xs text-inksoft">
+            <Star className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 fill-amber-400 text-amber-400" />
+            <span>
+              Urutan diatur otomatis: produk unggulan paling atas, lalu dikelompokkan per kategori.
+            </span>
           </p>
         </div>
         <Link to="/admin/produk/baru" className="btn btn-primary">
@@ -259,9 +286,6 @@ const AdminProducts: React.FC = () => {
                   >
                     {product.name}
                   </Link>
-                  {product.isFeatured && (
-                    <Star className="h-3.5 w-3.5 flex-shrink-0 fill-amber-400 text-amber-400" />
-                  )}
                 </div>
 
                 <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-inksoft">
@@ -350,6 +374,30 @@ const AdminProducts: React.FC = () => {
               </div>
 
               <div className="flex w-full flex-shrink-0 items-center justify-end gap-1 border-t border-line pt-3 md:w-auto md:border-0 md:pt-0">
+                <button
+                  onClick={() => void handleToggleFeatured(product)}
+                  disabled={busyId === product.id}
+                  title={
+                    product.isFeatured
+                      ? 'Lepas tanda unggulan'
+                      : 'Jadikan unggulan (naik ke urutan atas katalog)'
+                  }
+                  aria-label={product.isFeatured ? 'Lepas unggulan' : 'Jadikan unggulan'}
+                  aria-pressed={product.isFeatured}
+                  className={`icon-btn h-9 w-9 ${
+                    product.isFeatured
+                      ? 'bg-amber-100 text-amber-600 hover:bg-amber-200'
+                      : 'bg-surface2/60 hover:bg-surface2'
+                  }`}
+                >
+                  {busyId === product.id ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Star
+                      className={`h-4 w-4 ${product.isFeatured ? 'fill-amber-400 text-amber-500' : ''}`}
+                    />
+                  )}
+                </button>
                 <button
                   onClick={() => handleToggle(product)}
                   disabled={busyId === product.id}

@@ -26,7 +26,6 @@ interface ProductRow {
   stock: number;
   is_available: boolean;
   is_featured: boolean;
-  sort_order: number;
   description: string;
   fruit_features: string;
   plant_features: string;
@@ -40,7 +39,6 @@ interface CategoryRow {
   id: number;
   name: string;
   slug: string;
-  sort_order: number;
 }
 
 const PRODUCT_COLUMNS = [
@@ -54,7 +52,6 @@ const PRODUCT_COLUMNS = [
   'stock',
   'is_available',
   'is_featured',
-  'sort_order',
   'description',
   'fruit_features',
   'plant_features',
@@ -86,7 +83,6 @@ function mapProductRow(row: ProductRow): Product {
     stock: row.stock,
     isAvailable: row.is_available,
     isFeatured: row.is_featured,
-    sortOrder: row.sort_order,
     description: row.description,
     fruitFeatures: row.fruit_features,
     plantFeatures: row.plant_features,
@@ -109,13 +105,40 @@ export function mapSeedProduct(p: SeedProduct): Product {
     stock: SEED_DEFAULT_STOCK,
     isAvailable: true,
     isFeatured: SEED_FEATURED_IDS.includes(p.id),
-    sortOrder: p.id,
     description: p.description,
     fruitFeatures: p.fruitFeatures,
     plantFeatures: p.plantFeatures,
     plantingGuide: p.plantingGuide,
     careGuide: p.careGuide,
   };
+}
+
+/**
+ * Urutan katalog otomatis — admin tidak perlu mengisi nomor urut apa pun.
+ *
+ * 1. Produk unggulan (centang "Jadikan unggulan" di admin) paling depan.
+ * 2. Sisanya dikelompokkan per kategori, A–Z.
+ * 3. Produk yang stoknya masih ada didahulukan daripada yang habis.
+ * 4. Nama produk A–Z sebagai penentu terakhir supaya urutan tidak berubah-ubah.
+ *
+ * Karena unggulan ditaruh paling depan, saat pembeli membuka satu kategori
+ * produk unggulan di kategori itu otomatis muncul paling awal.
+ */
+export function urutkanProduk(daftar: Product[]): Product[] {
+  return [...daftar].sort((a, b) => {
+    if (a.isFeatured !== b.isFeatured) return a.isFeatured ? -1 : 1;
+
+    // Produk tanpa kategori ditaruh paling belakang, bukan paling depan.
+    const kategoriA = a.category || '\uffff';
+    const kategoriB = b.category || '\uffff';
+    const bedaKategori = kategoriA.localeCompare(kategoriB, 'id');
+    if (bedaKategori !== 0) return bedaKategori;
+
+    const habisA = a.stock > 0 ? 0 : 1;
+    const habisB = b.stock > 0 ? 0 : 1;
+    if (habisA !== habisB) return habisA - habisB;
+    return a.name.localeCompare(b.name, 'id');
+  });
 }
 
 /** true kalau web masih memakai data statis (Supabase belum diisi). */
@@ -125,13 +148,12 @@ export function usingStaticData(): boolean {
 
 export async function fetchProducts(): Promise<Product[]> {
   if (!isSupabaseConfigured) {
-    return seedProducts.map(mapSeedProduct);
+    return urutkanProduk(seedProducts.map(mapSeedProduct));
   }
 
   const { data, error } = await supabase
     .from('products')
     .select(PRODUCT_COLUMNS)
-    .order('sort_order', { ascending: true })
     .order('id', { ascending: true });
 
   if (error) throw new Error(`Gagal memuat produk: ${error.message}`);
@@ -139,7 +161,9 @@ export async function fetchProducts(): Promise<Product[]> {
   const rows = (data ?? []) as unknown as ProductRow[];
   if (rows.length === 0) return [];
 
-  return rows.map(mapProductRow);
+  // Urutan tampil dihitung di sini, bukan di database: admin cukup mencentang
+  // "Unggulan" dan katalog mengurutkan sendiri (lihat urutkanProduk).
+  return urutkanProduk(rows.map(mapProductRow));
 }
 
 /** Terima id numerik maupun slug, supaya URL lama /produk/3 tetap jalan. */
@@ -149,7 +173,7 @@ export async function fetchProduct(idOrSlug: string): Promise<Product | null> {
 
   if (!isSupabaseConfigured) {
     const found = seedProducts
-      .map(mapSeedProduct)
+      .map((p) => mapSeedProduct(p))
       .find((p) => (byId ? p.id === numeric : p.slug === idOrSlug));
     return found ?? null;
   }
@@ -166,21 +190,22 @@ export async function fetchProduct(idOrSlug: string): Promise<Product | null> {
   return mapProductRow(data as unknown as ProductRow);
 }
 
+/** Kategori selalu tampil A–Z; tidak ada nomor urut yang perlu diatur admin. */
 export async function fetchCategories(): Promise<Category[]> {
   if (!isSupabaseConfigured) {
-    const names = Array.from(new Set(seedProducts.map((p) => p.category)));
+    const names = Array.from(new Set(seedProducts.map((p) => p.category))).sort((a, b) =>
+      a.localeCompare(b, 'id'),
+    );
     return names.map((name, index) => ({
       id: index + 1,
       name,
       slug: slugify(name),
-      sortOrder: index,
     }));
   }
 
   const { data, error } = await supabase
     .from('categories')
-    .select('id, name, slug, sort_order')
-    .order('sort_order', { ascending: true })
+    .select('id, name, slug')
     .order('name', { ascending: true });
 
   if (error) throw new Error(`Gagal memuat kategori: ${error.message}`);
@@ -189,6 +214,5 @@ export async function fetchCategories(): Promise<Category[]> {
     id: row.id,
     name: row.name,
     slug: row.slug,
-    sortOrder: row.sort_order,
   }));
 }

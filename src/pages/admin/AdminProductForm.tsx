@@ -35,7 +35,6 @@ const emptyForm: ProductInput = {
   stock: 0,
   isAvailable: true,
   isFeatured: false,
-  sortOrder: 0,
   description: '',
   fruitFeatures: '',
   plantFeatures: '',
@@ -55,7 +54,6 @@ const AdminProductForm: React.FC = () => {
   const [promoText, setPromoText] = useState('');
   const [stockText, setStockText] = useState('0');
   const [ratingText, setRatingText] = useState('5');
-  const [sortText, setSortText] = useState('0');
   const [slugTouched, setSlugTouched] = useState(false);
 
   const [loading, setLoading] = useState(isEdit);
@@ -104,7 +102,6 @@ const AdminProductForm: React.FC = () => {
           stock: product.stock,
           isAvailable: product.isAvailable,
           isFeatured: product.isFeatured,
-          sortOrder: product.sortOrder,
           description: product.description,
           fruitFeatures: product.fruitFeatures,
           plantFeatures: product.plantFeatures,
@@ -116,7 +113,6 @@ const AdminProductForm: React.FC = () => {
         setPromoText(product.discountPrice === null ? '' : String(product.discountPrice));
         setStockText(String(product.stock));
         setRatingText(String(product.rating));
-        setSortText(String(product.sortOrder));
         setSlugTouched(true);
       } catch (err) {
         if (active) setError(err instanceof Error ? err.message : 'Gagal memuat produk.');
@@ -233,7 +229,6 @@ const AdminProductForm: React.FC = () => {
       discountPrice,
       stock: toNumber(stockText),
       rating: Math.min(5, Math.max(0, toNumber(ratingText, 5))),
-      sortOrder: toNumber(sortText),
     };
 
     setSaving(true);
@@ -455,7 +450,7 @@ const AdminProductForm: React.FC = () => {
           <p className={`field-hint ${promoValid ? '' : '!text-danger'}`}>{pesanPromo}</p>
         </div>
 
-        <div className="grid gap-5 sm:grid-cols-3">
+        <div className="grid gap-5 sm:grid-cols-2">
           <div>
             <label htmlFor="stok" className={labelCls}>
               Stok
@@ -482,19 +477,6 @@ const AdminProductForm: React.FC = () => {
               className="field"
             />
           </div>
-          <div>
-            <label htmlFor="urutan" className={labelCls}>
-              Urutan Tampil
-            </label>
-            <input
-              id="urutan"
-              type="text"
-              inputMode="numeric"
-              value={sortText}
-              onChange={(e) => setSortText(e.target.value)}
-              className="field"
-            />
-          </div>
         </div>
 
         <div>
@@ -515,25 +497,32 @@ const AdminProductForm: React.FC = () => {
           <p className="field-hint">Alamat halaman produk: /produk/{form.slug || 'slug-produk'}</p>
         </div>
 
-        <div className="flex flex-col gap-3 border-t border-line pt-5 sm:flex-row sm:gap-8">
-          <label className="flex cursor-pointer items-center gap-3">
-            <input
-              type="checkbox"
-              checked={form.isAvailable}
-              onChange={(e) => update('isAvailable', e.target.checked)}
-              className="h-5 w-5 rounded-md accent-[#156a3e]"
-            />
-            <span className="text-sm font-bold text-ink">Tampilkan di katalog</span>
-          </label>
-          <label className="flex cursor-pointer items-center gap-3">
-            <input
-              type="checkbox"
-              checked={form.isFeatured}
-              onChange={(e) => update('isFeatured', e.target.checked)}
-              className="h-5 w-5 rounded-md accent-[#156a3e]"
-            />
-            <span className="text-sm font-bold text-ink">Tampilkan di beranda (unggulan)</span>
-          </label>
+        <div className="space-y-3 border-t border-line pt-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:gap-8">
+            <label className="flex cursor-pointer items-center gap-3">
+              <input
+                type="checkbox"
+                checked={form.isAvailable}
+                onChange={(e) => update('isAvailable', e.target.checked)}
+                className="h-5 w-5 rounded-md accent-[#156a3e]"
+              />
+              <span className="text-sm font-bold text-ink">Tampilkan di katalog</span>
+            </label>
+            <label className="flex cursor-pointer items-center gap-3">
+              <input
+                type="checkbox"
+                checked={form.isFeatured}
+                onChange={(e) => update('isFeatured', e.target.checked)}
+                className="h-5 w-5 rounded-md accent-[#156a3e]"
+              />
+              <span className="text-sm font-bold text-ink">Tampilkan di beranda (unggulan)</span>
+            </label>
+          </div>
+          <p className="field-hint">
+            Produk yang dicentang muncul di bagian “Produk Unggulan” beranda (maksimal 4) dan
+            diletakkan paling atas di katalog. Urutan sisanya otomatis: per kategori, stok tersedia
+            dulu, lalu nama A–Z. Tidak ada nomor urut yang perlu diisi.
+          </p>
         </div>
       </section>
 

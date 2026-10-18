@@ -13,7 +13,6 @@ export interface Product {
   stock: number;
   isAvailable: boolean;
   isFeatured: boolean;
-  sortOrder: number;
   description: string;
   fruitFeatures: string;
   plantFeatures: string;
@@ -44,7 +43,6 @@ export interface Category {
   id: number;
   name: string;
   slug: string;
-  sortOrder: number;
   productCount?: number;
 }
 
@@ -63,7 +61,6 @@ export interface ProductInput {
   stock: number;
   isAvailable: boolean;
   isFeatured: boolean;
-  sortOrder: number;
   description: string;
   fruitFeatures: string;
   plantFeatures: string;
