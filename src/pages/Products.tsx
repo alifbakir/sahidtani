@@ -133,7 +133,7 @@ const Products: React.FC<ProductsProps> = ({ onAddToCart }) => {
   return (
     <div>
       {/* ------------------------------------------------------- HEADER */}
-      <section className="border-b border-line bg-surface pb-8 pt-28 md:pb-12 md:pt-36">
+      <section className="border-b border-line bg-surface pb-8 pt-[calc(var(--nav-tinggi)+1.25rem)] md:pb-12 md:pt-36">
         <div className="shell">
           <span className="eyebrow">
             <Sprout className="h-3.5 w-3.5" /> Katalog bibit

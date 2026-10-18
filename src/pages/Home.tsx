@@ -112,7 +112,7 @@ const Home: React.FC<HomeProps> = ({ onAddToCart }) => {
       {/* ---------------------------------------------------------- HERO */}
       <section
         id="beranda"
-        className="relative isolate flex min-h-[86svh] items-center overflow-hidden md:min-h-[92svh]"
+        className="relative isolate flex min-h-[86svh] items-center overflow-hidden pt-[var(--nav-tinggi)] md:min-h-[92svh]"
       >
         <img
           src="/tkp.JPG"

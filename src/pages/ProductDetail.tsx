@@ -167,7 +167,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onAddToCart }) => {
 
   if (loading) {
     return (
-      <div className="shell grid gap-8 pt-28 md:grid-cols-2 md:pt-36">
+      <div className="shell grid gap-8 pt-[calc(var(--nav-tinggi)+1.25rem)] md:grid-cols-2 md:pt-36">
         <div className="skeleton aspect-square rounded-[2rem]" />
         <div className="space-y-4">
           <div className="skeleton h-6 w-28" />
@@ -219,7 +219,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onAddToCart }) => {
 
   return (
     <div className="pb-32 md:pb-20">
-      <div className="shell pt-28 md:pt-36">
+      <div className="shell pt-[calc(var(--nav-tinggi)+1.25rem)] md:pt-36">
         <Link
           to="/produk"
           state={{ pulihkanGulir: true }}
