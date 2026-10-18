@@ -16,10 +16,10 @@ interface ProductsProps {
 type Urutan = 'unggulan' | 'murah' | 'mahal' | 'rating';
 
 const opsiUrutan: { id: Urutan; label: string }[] = [
-  { id: 'unggulan', label: 'Paling unggulan' },
-  { id: 'murah', label: 'Harga terendah' },
-  { id: 'mahal', label: 'Harga tertinggi' },
-  { id: 'rating', label: 'Rating tertinggi' },
+  { id: 'unggulan', label: 'Unggulan' },
+  { id: 'murah', label: 'Termurah' },
+  { id: 'mahal', label: 'Termahal' },
+  { id: 'rating', label: 'Rating' },
 ];
 
 const Products: React.FC<ProductsProps> = ({ onAddToCart }) => {
@@ -149,11 +149,14 @@ const Products: React.FC<ProductsProps> = ({ onAddToCart }) => {
         </div>
       </section>
 
-      {/* -------------------------------------------- FILTER (LENGKET) */}
-      <div ref={barFilterRef} className="sticky top-16 z-30 border-b border-line bg-canvas/90 backdrop-blur-xl">
-        <div className="shell space-y-3 py-3">
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <div className="relative flex-1">
+      {/* --------------------------------------------------------- FILTER */}
+      {/* Pencarian & urutan ikut tergulir bersama halaman; hanya baris kategori
+          yang lengket. Dulu seluruh bar (191px = 23% layar HP) ikut lengket
+          sehingga katalog sendiri hampir tidak kebagian layar. */}
+      <div className="border-b border-line bg-canvas">
+        <div className="shell py-3">
+          <div className="flex items-center gap-2">
+            <div className="relative min-w-0 flex-1">
               <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-inksoft" />
               <input
                 type="search"
@@ -174,13 +177,13 @@ const Products: React.FC<ProductsProps> = ({ onAddToCart }) => {
               )}
             </div>
 
-            <div className="relative sm:w-56">
-              <SlidersHorizontal className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-inksoft" />
+            <div className="relative w-36 flex-shrink-0 sm:w-56">
+              <SlidersHorizontal className="pointer-events-none absolute left-4 top-1/2 hidden h-4 w-4 -translate-y-1/2 text-inksoft sm:block" />
               <select
                 value={urutan}
                 onChange={(e) => setUrutan(e.target.value as Urutan)}
                 aria-label="Urutkan produk"
-                className="field cursor-pointer appearance-none pl-11 pr-9 font-bold"
+                className="field cursor-pointer appearance-none pl-4 pr-8 font-bold sm:pl-11 sm:pr-9"
               >
                 {opsiUrutan.map((opsi) => (
                   <option key={opsi.id} value={opsi.id}>
@@ -188,15 +191,23 @@ const Products: React.FC<ProductsProps> = ({ onAddToCart }) => {
                   </option>
                 ))}
               </select>
-              <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-inksoft">
+              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-inksoft sm:right-4">
                 ▾
               </span>
             </div>
           </div>
+        </div>
+      </div>
 
+      {/* Baris kategori: satu-satunya bagian filter yang lengket (≈52px di HP). */}
+      <div
+        ref={barFilterRef}
+        className="sticky top-16 z-30 border-b border-line bg-canvas/95 backdrop-blur-xl"
+      >
+        <div className="shell py-2.5">
           {/* HP: digeser ke samping. Desktop: dibungkus ke baris berikutnya supaya
               semua kategori kelihatan tanpa perlu digeser. */}
-          <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
+          <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
             {categoryNames.map((category) => (
               <button
                 key={category}
