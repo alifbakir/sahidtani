@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   ShoppingCart,
@@ -37,6 +37,28 @@ const Navbar: React.FC<NavbarProps> = ({ cartCount, onCartClick }) => {
   const { isDark, toggle } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  /**
+   * Saat pindah halaman, gulir kembali ke paling atas. Tanpa ini navbar masih
+   * dalam keadaan "mengecil" (65px) lalu beranimasi membesar ke 101px selama
+   * 300 ms — seluruh isi halaman baru terlihat "turun" sesaat setelah dibuka.
+   * Jadi pada frame pertama setelah pindah halaman, transisi dimatikan.
+   */
+  const [tanpaAnimasi, setTanpaAnimasi] = useState(false);
+
+  useLayoutEffect(() => {
+    setTanpaAnimasi(true);
+    let r2 = 0;
+    const r1 = requestAnimationFrame(() => {
+      setScrolled(window.scrollY > 24);
+      r2 = requestAnimationFrame(() => setTanpaAnimasi(false));
+    });
+    return () => {
+      cancelAnimationFrame(r1);
+      cancelAnimationFrame(r2);
+    };
+  }, [pathname]);
+
+  const animasiHeader = tanpaAnimasi ? 'transition-none' : 'transition-all duration-300';
 
   // Header mengecil saat digulir supaya layar HP tidak termakan.
   useEffect(() => {
@@ -66,7 +88,7 @@ const Navbar: React.FC<NavbarProps> = ({ cartCount, onCartClick }) => {
     <header className="fixed inset-x-0 top-0 z-50">
       {/* Pita informasi: ikut hilang begitu halaman digulir. */}
       <div
-        className={`overflow-hidden bg-deep text-ondeep transition-all duration-300 ${
+        className={`overflow-hidden bg-deep text-ondeep ${animasiHeader} ${
           scrolled ? 'max-h-0 opacity-0' : 'max-h-10 opacity-100'
         }`}
       >
@@ -89,7 +111,7 @@ const Navbar: React.FC<NavbarProps> = ({ cartCount, onCartClick }) => {
       >
         <div className="shell">
           <div
-            className={`flex items-center justify-between gap-2 transition-all duration-300 ${
+            className={`flex items-center justify-between gap-2 ${animasiHeader} ${
               scrolled ? 'h-16' : 'h-16 md:h-20'
             }`}
           >
@@ -97,7 +119,7 @@ const Navbar: React.FC<NavbarProps> = ({ cartCount, onCartClick }) => {
               <img
                 src="/logonavbarnobg.png"
                 alt="Logo Sahid Tani"
-                className={`w-auto object-contain transition-all duration-300 ${
+                className={`w-auto object-contain ${animasiHeader} ${
                   scrolled ? 'h-9 md:h-10' : 'h-10 md:h-12'
                 }`}
               />
