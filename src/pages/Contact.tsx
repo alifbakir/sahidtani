@@ -15,15 +15,15 @@ import {
 import Reveal from '../components/Reveal';
 import { useMeta } from '../hooks/useMeta';
 
-// URL Google Maps harus memakai parameter `data=` lengkap. Tanpa itu Google
-// membuang nama tempatnya ("/maps/place//@...") sehingga yang terbuka peta
-// kosong di koordinat tengah, bukan listing Sahid Tani.
-const PLACE_URL =
-  'https://www.google.com/maps/place/Sahid+Tani/@-7.3424766,110.5019279,17z/data=!3m1!4b1!4m6!3m5!1s0x2e7a79cc11934a49:0x59def18ab53e0353!8m2!3d-7.3424819!4d110.5045028!16s%2Fg%2F11dfg0kndg?entry=ttu';
+// Tautan listing: pakai CID resmi dari tombol "Bagikan" Google Maps. Ini bentuk
+// paling tahan lama — selalu mendarat tepat di listing Sahid Tani (URL pendek
+// /maps/place/Nama/@lat,lng tanpa `data=` dirombak Google jadi peta kosong).
+const PLACE_URL = 'https://www.google.com/maps?cid=6475878892253872979';
 
-// Tautan rute: koordinat listing (bukan titik tengah peta) + api=1 supaya
-// aplikasi Google Maps langsung terbuka di HP dan langsung menghitung rute.
-const RUTE_URL = 'https://www.google.com/maps/dir/?api=1&destination=-7.3424819,110.5045028';
+// Tautan rute: nama + alamat lengkap toko, bukan sekadar koordinat, supaya di
+// aplikasi Google Maps yang muncul langsung nama "Sahid Tani" beserta ruternya.
+const RUTE_URL =
+  'https://www.google.com/maps/dir/?api=1&destination=Sahid+Tani,+Jl.+Plongkowati+No.7,+Tegalrejo,+Kec.+Argomulyo,+Kota+Salatiga,+Jawa+Tengah+50733';
 
 const kontak = [
   {
