@@ -15,12 +15,22 @@ import {
 import Reveal from '../components/Reveal';
 import { useMeta } from '../hooks/useMeta';
 
+// URL Google Maps harus memakai parameter `data=` lengkap. Tanpa itu Google
+// membuang nama tempatnya ("/maps/place//@...") sehingga yang terbuka peta
+// kosong di koordinat tengah, bukan listing Sahid Tani.
+const PLACE_URL =
+  'https://www.google.com/maps/place/Sahid+Tani/@-7.3424766,110.5019279,17z/data=!3m1!4b1!4m6!3m5!1s0x2e7a79cc11934a49:0x59def18ab53e0353!8m2!3d-7.3424819!4d110.5045028!16s%2Fg%2F11dfg0kndg?entry=ttu';
+
+// Tautan rute: koordinat listing (bukan titik tengah peta) + api=1 supaya
+// aplikasi Google Maps langsung terbuka di HP dan langsung menghitung rute.
+const RUTE_URL = 'https://www.google.com/maps/dir/?api=1&destination=-7.3424819,110.5045028';
+
 const kontak = [
   {
     icon: MapPin,
     label: 'Alamat',
     value: 'Jl. Plongkowati No.7, Tegalrejo, Kec. Argomulyo, Kota Salatiga, Jawa Tengah 50733',
-    href: 'https://www.google.com/maps/place/Sahid+Tani/@-7.3424766,110.5019279,17z/data=!3m1!4b1!4m6!3m5!1s0x2e7a79cc11934a49:0x59def18ab53e0353!8m2!3d-7.3424819!4d110.5045028!16s%2Fg%2F11dfg0kndg?entry=ttu',
+    href: PLACE_URL,
   },
   { icon: Phone, label: 'Telepon / WhatsApp', value: '+62 858 7841 2411', href: 'https://wa.me/6285878412411' },
   { icon: Mail, label: 'Email', value: 'sahidtani@gmail.com', href: 'mailto:sahidtani@gmail.com' },
@@ -82,7 +92,7 @@ const Contact = () => {
                 <MessageCircle className="h-4 w-4" /> Chat WhatsApp
               </a>
               <a
-                href="https://www.google.com/maps/place/Sahid+Tani/@-7.3424766,110.5019279,17z"
+                href={RUTE_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn w-full border border-white/25 bg-white/10 text-white backdrop-blur-sm hover:bg-white/20 sm:w-auto"
@@ -244,7 +254,7 @@ const Contact = () => {
               title="Lokasi Sahid Tani"
             />
             <a
-              href="https://www.google.com/maps/place/Sahid+Tani/@-7.3424766,110.5019279,17z/data=!3m1!4b1!4m6!3m5!1s0x2e7a79cc11934a49:0x59def18ab53e0353!8m2!3d-7.3424819!4d110.5045028!16s%2Fg%2F11dfg0kndg?entry=ttu"
+              href={RUTE_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="card absolute bottom-4 left-4 right-4 flex items-center gap-3 p-4 transition-transform hover:-translate-y-0.5 md:left-6 md:top-6 md:right-auto md:bottom-auto md:max-w-[16rem]"
